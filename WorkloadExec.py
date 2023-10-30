@@ -55,6 +55,7 @@ class Workloads:
     __perf_stat_cmd_result_options='--summary -o '
     __perf_stat_cmd_sampling_options='-I 100 '
     __perf_stat_cmd_cpu_options='-a' 
+    __perf_stat_cmd_repeat_options='-r 10' 
     ## Perf events to be monitored.
     __perf_event_listing=\
             'branch-instructions,branch-misses,branch-load-misses,branch-loads,'\
@@ -76,14 +77,18 @@ class Workloads:
         """Constructor, initialized with list of workloads"""
         self.__workload_count = len(workloads)
         self.__workloads = []
+        self.__resultsfile = []
         for item in workloads:
+            results_file = item.name()+'.prof'
             workload_cmd_temp = self.__perf_stat_cmd_prefix +' '\
                             + self.__perf_stat_cmd_result_options + item.name()+'.prof'+' '\
                             + self.__perf_stat_cmd_sampling_options +' '\
                             + self.__perf_stat_cmd_cpu_options +' '\
+                            + self.__perf_stat_cmd_repeat_options + ' '\
                             + '-e ' + self.__perf_event_listing +' '\
                             + item.cmd()
             self.__workloads.append(workload_cmd_temp)
+            self.__resultsfile.append(results_file)
 
 
     def __len__(self):
@@ -111,6 +116,9 @@ class Workloads:
     def dump (self):
         for item in self.__workloads:
             print (item)
+    
+    def results_files(self) -> [str]:
+        return self.__resultsfile
 
 class WorkloadManager:
     """Class to handle workloads and execute them on target device
@@ -143,6 +151,12 @@ class WorkloadManager:
             self.__ssh_fabric_con.run(workload_item)
             # print (workload_item)
     
+    def download_results(self) -> None:
+        """ Pull results file of workload from device"""
+        result_files = self.__workloads.results_files()
+        for results_file in result_files:
+            self.__ssh_fabric_con.get(results_file,'')
+
 
 if __name__ == '__main__':
     workload_listing = []
@@ -165,6 +179,7 @@ if __name__ == '__main__':
                         dev_pass = 'odroid',
                         workloads = workloads_obj
                         )
-    workloads.batch_execute()
+    # workloads.batch_execute()
+    workloads.download_results()
     
 
