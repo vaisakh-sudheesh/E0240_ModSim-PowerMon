@@ -6,8 +6,10 @@ functions. More information SmartPower3 unit can be found in SmartPower3
 wiki URL:
      https://wiki.odroid.com/accessory/power_supply_battery/smartpower3
 
-Author: Vaisakh P S <vaisakhp@iisc.ac.in>
+Author(s): 
+ - Vaisakh P S <vaisakhp@iisc.ac.in>
 Date: 29-10-2023
+
 Assumptions:
   (1) It is assumed that the SmartPower3 monitor is already pre-configured with
       required configuration. such as:
@@ -76,7 +78,7 @@ class SmartPower3_NCSampler:
                     fields = data.strip().split(b',')
                     row = [datetime.datetime.now()]+fields
                     self.writer.writerow(row)
-                    # print("\ndebug: packet received: {row}")
+                    print("\ndebug: packet received: "+str(row))
         except socket.timeout:
             print("\nerror: socket timeout")
     

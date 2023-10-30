@@ -138,6 +138,7 @@ class WorkloadManager:
         # self.__workloads.dump()
     
     def batch_execute(self) -> None:
+        """Sequentially Execute the workloads"""
         for workload_item in self.__workloads:
             self.__ssh_fabric_con.run(workload_item)
             # print (workload_item)
