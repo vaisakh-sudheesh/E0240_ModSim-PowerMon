@@ -258,7 +258,7 @@ if __name__ == '__main__':
                         'stress','-c 3 -t 10s'))
     workload_listing.append(WorkloadRecord('stress-4cpu-10s',
                         'stress','-c 4 -t 10s'))
-    workloads_obj = Workloads(workload_listing, 1)
+    workloads_obj = Workloads(workload_listing, 10)
     
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
