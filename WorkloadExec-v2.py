@@ -62,7 +62,7 @@ class SmartPower3_NCSampler:
     
 
     def __ProcessPacket(self)-> None:
-        """Function to process each packets, this will wait indefinitely until interrupted"""
+        """Function to process each packets"""
         try:
             while (self.bExit == False):
                 ready = select.select([self.sock], [], [], 1)
@@ -311,8 +311,6 @@ if __name__ == '__main__':
 
     ############## FFMPEG Encode/Decode Workloads - BEGIN   ##################
     if (enable_encode_workloads == True):
-        pass
-        ##ffmpeg 
         workload_listing.append(WorkloadRecord('ffmpeg-360p','ffmpeg',
                     '-i \'Silent Love-360p.mp4\' -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
         workload_listing.append(WorkloadRecord('ffmpeg-720p','ffmpeg',
