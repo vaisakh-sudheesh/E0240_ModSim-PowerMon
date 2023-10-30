@@ -220,70 +220,107 @@ class WorkloadManager:
         
         self.__powerMonSampler = SmartPower3_NCSampler()
         
-    
+    def push_dependent_files(self, workload_data:str) -> None:
+        print ('Pushing dependencies to device... Please wait')
+        self.__ssh_fabric_con.run ('mkdir -p bench-data')
+        # Clean the old files - if any
+        with self.__ssh_fabric_con.cd('bench-data/'):
+            self.__ssh_fabric_con.run ('rm -f *')
+
+        
+        self.__ssh_fabric_con.put(workload_data+'/Silent Love-360p.mp4','bench-data/')
+        self.__ssh_fabric_con.put(workload_data+'/Silent Love-720p.mp4','bench-data/')
+        self.__ssh_fabric_con.put(workload_data+'/cantrbry.zip','bench-data/')
+        self.__ssh_fabric_con.put(workload_data+'/enwik8.zip','bench-data/')
+        self.__ssh_fabric_con.put(workload_data+'/webster.bz2','bench-data/')
+
+        print ('Extracting files... Please wait')
+        with self.__ssh_fabric_con.cd('bench-data/'):
+            self.__ssh_fabric_con.run ('bzip2 -d webster.bz2')
+            self.__ssh_fabric_con.run ('unzip enwik8.zip')
+            self.__ssh_fabric_con.run ('unzip cantrbry.zip')
+            self.__ssh_fabric_con.run ('rm -f cantrbry.zip enwik8.zip')
+
+
     def batch_execute(self, results_dir:str) -> None:
         """Sequentially Execute the workloads"""
 
-        ## Create results directory
-        self.__ssh_fabric_con.run ('mkdir -p results/'+results_dir)
-        workload_ctr = 0
-        total_workload = len(self.__workloads)
-        ## Iterate and execute each jobs
-        for workload_item in self.__workloads:
-            workload_ctr += 1
-            result = workload_item[0]
-            cmd = workload_item[1]
-            print ('======= Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
+        with self.__ssh_fabric_con.cd('bench-data/'):
+            ## Create results directory
+            self.__ssh_fabric_con.run ('mkdir -p results/')
+            workload_ctr = 0
+            total_workload = len(self.__workloads)
+            ## Iterate and execute each jobs
+            for workload_item in self.__workloads:
+                workload_ctr += 1
+                result = workload_item[0]
+                cmd = workload_item[1]
+                print ('======= Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
+                print('results file==> '+result)
 
-            ## Start sampling via SmartPower3
-            self.__powerMonSampler.StartSampling(results_dir+'/'+os.path.basename(result)+'.powdata')
+                ## Start sampling via SmartPower3
+                self.__powerMonSampler.StartSampling(results_dir+'/'+os.path.basename(result)+'.powdata')
 
-            ## Execute the workload on device
-            self.__ssh_fabric_con.run(cmd)
+                ## Execute the workload on device
+                self.__ssh_fabric_con.run(cmd)
 
-            ## Stop power data sampling from SmartPower3
-            self.__powerMonSampler.StopSampling()
+                ## Stop power data sampling from SmartPower3
+                self.__powerMonSampler.StopSampling()
 
-            ## Fetch results from remote
-
-            self.__ssh_fabric_con.get(result, results_dir+'/'+os.path.basename(result))
+                ## Fetch results from remote
+                self.__ssh_fabric_con.get('bench-data/'+result, results_dir+'/'+os.path.basename(result))
 
 
 if __name__ == '__main__':
+    enable_stress_workloads = True
+    enable_compress_workloads = True
+    enable_encode_workloads = True
+    
     workload_listing = []
     ## List out the workloads
-    ### CPU Only workloads
-    workload_listing.append(WorkloadRecord('stress-1cpu-100s',
-                        'stress','-c 1 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-2cpu-100s',
-                        'stress','-c 2 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-3cpu-100s',
-                        'stress','-c 3 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-4cpu-100s',
-                        'stress','-c 4 -t 100s'))
     
-    ### IO Only workloads
-    workload_listing.append(WorkloadRecord('stress-1io-100s',
-                        'stress','-i 1 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-2io-100s',
-                        'stress','-i 2 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-3io-100s',
-                        'stress','-i 3 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-4io-100s',
-                        'stress','-i 4 -t 100s'))
+        ###################### Stress workloads - BEGIN ######################
+    if (enable_stress_workloads == True):
+        ### ------------ CPU Only workloads ------------ 
+        workload_listing.append(WorkloadRecord('stress-1cpu-50s', 'stress','-c 1 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-2cpu-50s', 'stress','-c 2 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-3cpu-50s', 'stress','-c 3 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-4cpu-50s', 'stress','-c 4 -t 50s'))
+        ### ------------ IO Only workloads ------------ 
+        workload_listing.append(WorkloadRecord('stress-1io-50s', 'stress','-i 1 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-2io-50s', 'stress','-i 2 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-3io-50s', 'stress','-i 3 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-4io-50s', 'stress','-i 4 -t 50s'))
+        ### ------------  CPU & IO Only workloads ------------ 
+        workload_listing.append(WorkloadRecord('stress-1cpuio-50s', 'stress','-c 1 -i 1 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-2cpuio-50s', 'stress','-c 2 -i 2 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-3cpuio-50s', 'stress','-c 3 -i 3 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-4cpuio-50s', 'stress','-c 4 -i 4 -t 50s'))
+    ###################### Stress workloads - END   ######################
 
-    ### CPU & IO Only workloads
-    workload_listing.append(WorkloadRecord('stress-1cpuio-100s',
-                        'stress','-c 1 -i 1 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-2cpuio-100s',
-                        'stress','-c 2 -i 2 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-3cpuio-100s',
-                        'stress','-c 3 -i 3 -t 100s'))
-    workload_listing.append(WorkloadRecord('stress-4cpuio-100s',
-                        'stress','-c 4 -i 4 -t 100s'))
+    #################### Compression Workloads - BEGIN   ####################
+    if (enable_compress_workloads == True):
+        workload_listing.append(WorkloadRecord('bzip2-webster','bzip2','-k webster'))
+        workload_listing.append(WorkloadRecord('bzip2-enwik8','bzip2','-k enwik8'))
+        workload_listing.append(WorkloadRecord('gzip-webster','gzip','-k webster'))
+        workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k enwik8'))
+        workload_listing.append(WorkloadRecord('xz-webster','xz','-k webster'))
+        ## This seems to be extremely heavy & time consuming workload - for now disabling
+        # workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k enwik8'))
+    #################### Compression Workloads - END     ####################
+
+    ############## FFMPEG Encode/Decode Workloads - BEGIN   ##################
+    if (enable_encode_workloads == True):
+        pass
+        ##ffmpeg 
+        workload_listing.append(WorkloadRecord('ffmpeg-360p','ffmpeg',
+                    '-i \'Silent Love-360p.mp4\' -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
+        workload_listing.append(WorkloadRecord('ffmpeg-720p','ffmpeg',
+                    '-i \'Silent Love-720p.mp4\' -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
+    ############## FFMPEG Encode/Decode Workloads - END     ##################
     
     ## Compile the workload list & initialize the job
-    workloads_obj = Workloads(workload_listing, 10)
+    workloads_obj = Workloads(workload_listing, 3)
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
                         dev_pass = 'odroid',
@@ -306,6 +343,8 @@ if __name__ == '__main__':
     if (os.path.exists(results_path) == False):
         os.mkdir(results_path)
 
+    workload_data = os.path.join(parent_dirname,'data')
+    workloads.push_dependent_files(workload_data)
     ## Execute the workload and gather results
     workloads.batch_execute(results_dirname)
     
