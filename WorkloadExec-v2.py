@@ -279,7 +279,7 @@ if __name__ == '__main__':
     workload_listing = []
     ## List out the workloads
     
-        ###################### Stress workloads - BEGIN ######################
+    ###################### Stress workloads - BEGIN ######################
     if (enable_stress_workloads == True):
         ### ------------ CPU Only workloads ------------ 
         workload_listing.append(WorkloadRecord('stress-1cpu-50s', 'stress','-c 1 -t 50s'))
