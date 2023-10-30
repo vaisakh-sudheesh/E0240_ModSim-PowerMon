@@ -226,11 +226,14 @@ class WorkloadManager:
 
         ## Create results directory
         self.__ssh_fabric_con.run ('mkdir -p results/'+results_dir)
-        
+        workload_ctr = 0
+        total_workload = len(self.__workloads)
         ## Iterate and execute each jobs
         for workload_item in self.__workloads:
+            workload_ctr += 1
             result = workload_item[0]
             cmd = workload_item[1]
+            print ('======= Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
 
             ## Start sampling via SmartPower3
             self.__powerMonSampler.StartSampling(results_dir+'/'+os.path.basename(result)+'.powdata')
@@ -249,16 +252,38 @@ class WorkloadManager:
 if __name__ == '__main__':
     workload_listing = []
     ## List out the workloads
-    workload_listing.append(WorkloadRecord('stress-1cpu-10s',
-                        'stress','-c 1 -t 10s'))
-    workload_listing.append(WorkloadRecord('stress-2cpu-10s',
-                        'stress','-c 2 -t 10s'))
-    workload_listing.append(WorkloadRecord('stress-3cpu-10s',
-                        'stress','-c 3 -t 10s'))
-    workload_listing.append(WorkloadRecord('stress-4cpu-10s',
-                        'stress','-c 4 -t 10s'))
-    workloads_obj = Workloads(workload_listing, 10)
+    ### CPU Only workloads
+    workload_listing.append(WorkloadRecord('stress-1cpu-100s',
+                        'stress','-c 1 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-2cpu-100s',
+                        'stress','-c 2 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-3cpu-100s',
+                        'stress','-c 3 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-4cpu-100s',
+                        'stress','-c 4 -t 100s'))
     
+    ### IO Only workloads
+    workload_listing.append(WorkloadRecord('stress-1io-100s',
+                        'stress','-i 1 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-2io-100s',
+                        'stress','-i 2 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-3io-100s',
+                        'stress','-i 3 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-4io-100s',
+                        'stress','-i 4 -t 100s'))
+
+    ### CPU & IO Only workloads
+    workload_listing.append(WorkloadRecord('stress-1cpuio-100s',
+                        'stress','-c 1 -i 1 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-2cpuio-100s',
+                        'stress','-c 2 -i 2 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-3cpuio-100s',
+                        'stress','-c 3 -i 3 -t 100s'))
+    workload_listing.append(WorkloadRecord('stress-4cpuio-100s',
+                        'stress','-c 4 -i 4 -t 100s'))
+    
+    ## Compile the workload list & initialize the job
+    workloads_obj = Workloads(workload_listing, 10)
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
                         dev_pass = 'odroid',
