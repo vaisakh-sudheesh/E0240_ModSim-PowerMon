@@ -225,7 +225,7 @@ class WorkloadManager:
         self.__ssh_fabric_con.run ('mkdir -p bench-data')
         # Clean the old files - if any
         with self.__ssh_fabric_con.cd('bench-data/'):
-            self.__ssh_fabric_con.run ('rm -f *')
+            self.__ssh_fabric_con.run ('rm -rf *')
 
         
         self.__ssh_fabric_con.put(workload_data+'/Silent Love-360p.mp4','bench-data/')
@@ -272,7 +272,7 @@ class WorkloadManager:
 
 
 if __name__ == '__main__':
-    enable_stress_workloads = True
+    enable_stress_workloads = False
     enable_compress_workloads = True
     enable_encode_workloads = True
     
@@ -300,21 +300,21 @@ if __name__ == '__main__':
 
     #################### Compression Workloads - BEGIN   ####################
     if (enable_compress_workloads == True):
-        workload_listing.append(WorkloadRecord('bzip2-webster','bzip2','-k webster'))
-        workload_listing.append(WorkloadRecord('bzip2-enwik8','bzip2','-k enwik8'))
-        workload_listing.append(WorkloadRecord('gzip-webster','gzip','-k webster'))
-        workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k enwik8'))
-        workload_listing.append(WorkloadRecord('xz-webster','xz','-k webster'))
+        workload_listing.append(WorkloadRecord('bzip2-webster','bzip2','-k -f webster'))
+        workload_listing.append(WorkloadRecord('bzip2-enwik8','bzip2','-k -f enwik8'))
+        workload_listing.append(WorkloadRecord('gzip-webster','gzip','-k -f webster'))
+        workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k -f enwik8'))
+        workload_listing.append(WorkloadRecord('xz-webster','xz','-k -f webster'))
         ## This seems to be extremely heavy & time consuming workload - for now disabling
-        # workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k enwik8'))
+        # workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
     #################### Compression Workloads - END     ####################
 
     ############## FFMPEG Encode/Decode Workloads - BEGIN   ##################
     if (enable_encode_workloads == True):
         workload_listing.append(WorkloadRecord('ffmpeg-360p','ffmpeg',
-                    '-i \'Silent Love-360p.mp4\' -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
+                    '-i \'Silent Love-360p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
         workload_listing.append(WorkloadRecord('ffmpeg-720p','ffmpeg',
-                    '-i \'Silent Love-720p.mp4\' -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
+                    '-i \'Silent Love-720p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
     ############## FFMPEG Encode/Decode Workloads - END     ##################
     
     ## Compile the workload list & initialize the job
