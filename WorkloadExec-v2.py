@@ -37,13 +37,18 @@ class SmartPower3_NCSampler:
     Ref: https://wiki.odroid.com/accessory/power_supply_battery/smartpower3#logging_protocol
     """
     pd_col_info = [
-                    'utctime',
-                    'localtime',
-                    'sm_mstime',
-                    'ps_ippwr-volts_mV','ps_ippwr-ampere_mA','ps_ippwr-watt_mW','ps_ippwr-status_b',
-                    'dev_ippwr-ch0-volts_mV', 'dev_ippwr-ch0-ampere_mA', 'dev_ippwr-ch0-watt_mW', 'dev_ippwr-ch0-status_b', 'dev_ippwr-ch0-interrupts',
-                    'dev_ippwr-ch1-volts_mV', 'dev_ippwr-ch1-ampere_mA','dev_ippwr-ch1-watt_mW', 'dev_ippwr-ch1-status_b', 'dev_ippwr-ch1-interrupts',
-                    'crc8-2sc', 'crc8-xor'
+        ## Time fields - UTC, Local and Milliseconds logged by SmartPower3
+        'utctime','localtime','sm_mstime',
+        ## Input Power parameters of SmartPower's power supply
+        'ps_ippwr-volts_mV','ps_ippwr-ampere_mA','ps_ippwr-watt_mW','ps_ippwr-status_b',
+        ## Channel-0's output supply parameters and status
+        'dev_ippwr-ch0-volts_mV', 'dev_ippwr-ch0-ampere_mA', 'dev_ippwr-ch0-watt_mW', 
+        'dev_ippwr-ch0-status_b', 'dev_ippwr-ch0-interrupts',
+        ## Channel-1's output supply parameters and status
+        'dev_ippwr-ch1-volts_mV', 'dev_ippwr-ch1-ampere_mA','dev_ippwr-ch1-watt_mW', 
+        'dev_ippwr-ch1-status_b', 'dev_ippwr-ch1-interrupts',
+        ## Checksum fields
+        'crc8-2sc', 'crc8-xor'
     ]
     
     def __init__(self) -> None:
@@ -216,19 +221,19 @@ class WorkloadManager:
         self.__powerMonSampler = SmartPower3_NCSampler()
         
     
-    def batch_execute(self) -> None:
+    def batch_execute(self, results_dir:str) -> None:
         """Sequentially Execute the workloads"""
 
         ## Create results directory
-        self.__ssh_fabric_con.run ('mkdir -p results')
-
+        self.__ssh_fabric_con.run ('mkdir -p results/'+results_dir)
+        
         ## Iterate and execute each jobs
         for workload_item in self.__workloads:
             result = workload_item[0]
             cmd = workload_item[1]
 
             ## Start sampling via SmartPower3
-            self.__powerMonSampler.StartSampling(result+'.powdata')
+            self.__powerMonSampler.StartSampling(results_dir+'/'+os.path.basename(result)+'.powdata')
 
             ## Execute the workload on device
             self.__ssh_fabric_con.run(cmd)
@@ -237,17 +242,11 @@ class WorkloadManager:
             self.__powerMonSampler.StopSampling()
 
             ## Fetch results from remote
-            self.__ssh_fabric_con.get(result,'results/'+os.path.basename(result))
+
+            self.__ssh_fabric_con.get(result, results_dir+'/'+os.path.basename(result))
 
 
 if __name__ == '__main__':
-
-    results_dirname = 'results'
-    parent_dirname = os.curdir
-    results_path = os.path.join(parent_dirname,results_dirname)
-    if (os.path.exists(results_path) == False):
-        os.mkdir(results_path)
-
     workload_listing = []
     ## List out the workloads
     workload_listing.append(WorkloadRecord('stress-1cpu-10s',
@@ -265,6 +264,24 @@ if __name__ == '__main__':
                         dev_pass = 'odroid',
                         workloads = workloads_obj
                         )
-    workloads.batch_execute()
+    
+    ## Time stamp to segregate test runs
+    test_run_name= datetime.datetime.now().strftime('%m-%d-%Y_%H-%M-%S')
+    print (test_run_name)
+
+    ## Create top level results directory
+    parent_dirname = os.curdir
+    results_dir_path = os.path.join(parent_dirname,'results')
+    if (os.path.exists(results_dir_path) == False):
+        os.mkdir(results_dir_path)
+
+    ## Create timestamped directory under results directory holding specific test run
+    results_dirname = 'results/'+test_run_name
+    results_path = os.path.join(results_dir_path,test_run_name)
+    if (os.path.exists(results_path) == False):
+        os.mkdir(results_path)
+
+    ## Execute the workload and gather results
+    workloads.batch_execute(results_dirname)
     
 
