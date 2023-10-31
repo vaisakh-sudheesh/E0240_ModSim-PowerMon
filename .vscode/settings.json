@@ -1,6 +1,12 @@
 {
     "cSpell.words": [
+        "Exynos",
+        "LPDDR",
+        "MAPE",
+        "ODROID",
+        "Reddy",
         "smartpower",
         "UART"
-    ]
+    ],
+    "latex-workshop.latex.outDir": "%DIR%/out"
 }

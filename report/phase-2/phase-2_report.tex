@@ -61,21 +61,21 @@ vaisakhp@iisc.ac.in}
     \par Power consumption is one of the key performance indices of any embedded or mobile device which operate of power budget, as this directly impacts on user experience and usability of any such devices. Hence, the need for accurate power models in simulation environment has increased as well, to enable designer and manufacturers to measure the impact of any new functionality or optimization that is being prototyped. Insights from such models, will allow all key stakeholders in an embedded product development arena for evaluation without waiting hardware fabrication and rollout, there by saving resources and investment.
 
     \par One of the main motivations for this project is the top-down power modeling approach\cite{Reddy2017EmpiricalCP} that utilized Performance Monitoring Counters(PMCs) in an actual hardware along with overall power consumption data to develop an empirical power model in Gem5 simulator\cite{8718630}. The average error achieved by this approach is claimed to be less than 6\%. We will further explore in to additional enhancement over this said approach by factoring in additional CPU performance metrics.
-
+    \medbreak
 %% ---------------------------------------------------------------------------------------------------------
 %% Covers Methodology, development strategy, data gathering approaches etc.
 \section{Methodology}
 %% ---------------------------------------------------------------------------------------------------------
-    \par As mentioned in previous work \cite{Reddy2017EmpiricalCP}, a similar method is followed in developing a Top-down Power model that will be integrated in to Gem5. ODROID-XU4\cite{odroid-xu4} Big-Little development board is chosen as first target for experimentation, data gathering and validation efforts. An overview of this hardware is show in Figure. \ref{fig-odroid-hwoverview}. ODROID-XU4 offers minimalistic development platform with a Samsung Exynos 5422 Octa ARM Cortex™-A15 Quad 2GHz and Cortex™-A7 Quad 1.3GHz CPUs, with a 2GB LPDDR3 RAM operating at 933MHz stacked along with CPU package. Both Cortex-A15 and Cortex-A7 cores has 32KB Instruction and Data caches each. For L2 cache, the Cortex-A15 and Cortex-A7 cores makes use of 2MB and 512 KB respectively.
+    \par As mentioned in previous work \cite{Reddy2017EmpiricalCP}, a similar method is followed in developing a Top-down Power model that will be integrated in to Gem5. ODROID-XU4\cite{odroid-xu4} Big-Little development board is chosen as first target for experimentation, data gathering and validation efforts. An overview of this hardware is show in Figure. \ref{fig-odroid-hwoverview}. ODROID-XU4 offers minimalistic development platform with a Samsung Exynos-5422 8-core ARM Cortex™-A15 Quad 2GHz and Cortex™-A7 Quad 1.3GHz CPUs, with a 2GB LPDDR3 RAM operating at 933MHz stacked along with CPU package. Both Cortex-A15 and Cortex-A7 cores has 32KB Instruction and Data caches each. For L2 cache, the Cortex-A15 and Cortex-A7 cores makes use of 2MB and 512 KB respectively.
 
     \begin{figure}[bh]
         \includegraphics{rsrc/201506191222574523.png}
-        \caption{ODroid XU4 board overview}
+        \caption{ODroid XU4 board overview, image source\cite{odroid-xu4}}
         \label{fig-odroid-hwoverview}
     \end{figure}
 
     \subsection{Modeling and Development Strategy}
-        \par Simulation of the ODROID-XU4/Exynos5422 will be integrated in to Gem5, that would closely resemble its CPU operating parameters. A SmartPower3 \cite{odroid-smartpower3}, power monitor unit will be used along ODROID-XU4 as represented in Figure. \ref{fig-Experiment-setup}, to measure overall power consumption on the hardware, while most of the peripheral modules on it will be kept to reduce any variation or impact on the measured data. In addition, the perf\cite{2015137} is used to gather PMC data-points. A summary of data-points being gathered for this modeling exercise is listed in Table \ref{Power-Perf-data-gathered}. These data-points are sampled at an interval of 100ms from both perf and SmartPower2 modules.
+        \par Simulation of the ODROID-XU4/Exynos-5422 will be integrated in to Gem5, that would closely resemble its CPU operating parameters. A SmartPower3 \cite{odroid-smartpower3}, power monitor unit will be used along ODROID-XU4 as represented in Figure. \ref{fig-Experiment-setup}, to measure overall power consumption on the hardware, while most of the peripheral modules on it will be kept to reduce any variation or impact on the measured data. In addition, the perf\cite{2015137} is used to gather PMC data-points. A summary of data-points being gathered for this modeling exercise is listed in Table \ref{Power-Perf-data-gathered}. These data-points are sampled at an interval of 100ms from both perf and SmartPower2 modules.
 
         \begin{figure}[t]
             \centering
@@ -87,7 +87,7 @@ vaisakhp@iisc.ac.in}
         \begin{table}[htbp]
             \caption{Power and Performance Feature gathered from mentioned experiment setup}
             \begin{center}
-                \begin{tabular}{|p{1.8cm}|p{1.5cm}|p{3.7cm}|}
+                \begin{tabular}{|p{1.8cm}|p{2cm}|p{3.6cm}|}
                     \hline
                     \textbf{Statistics}&\multicolumn{2}{|c|}{\textbf{Feature details}} \\
                     \cline{2-3} 
@@ -95,13 +95,13 @@ vaisakhp@iisc.ac.in}
                     \hline
                     CPU Clock Cycles  & perf\cite{2015137}  & CPU cycles, us cycles, instructions, CPU frequency, CPU idle state statistics \\
                     \hline
-                    Instruction Branches  & perf & Branch instruction and speculative operation statistics \\
+                    Branches  & perf & Branch instruction and speculative operation statistics \\
                     \hline
-                    Caches   & perf  & Data/Instruction cache references, misses at L1, Last-Level-Cache levels  \\
+                    Caches   & perf  &  Cache references, misses at various levels. \\
                     \hline
-                    Board Level Power consumption & SmartPower3\cite{odroid-smartpower3} & Current, Power drawn from power supply. \\
+                    Power & SmartPower3\cite{odroid-smartpower3} &  Power drawn from supply. \\
                     \hline
-                    Misc. Performance  & perf  & CPU Migrations, Context switches, Virtual memory \\
+                    Misc & perf  & CPU Migrations, Virtual memory etc. \\
                     \hline
                 \end{tabular}
                 \label{Power-Perf-data-gathered}
@@ -138,20 +138,30 @@ vaisakhp@iisc.ac.in}
     \par So far, team has completed, ramping up in to Gem5 simulator and its internals. In terms of actual hardware data gathering, the experiment setup shown in Figure \ref{fig-Experiment-setup} is established and data gathering of integrated workloads mentioned in Table \ref{Workload-listing} on ODROID-XU4 hardware is also completed as well.
 
     \par Mathematical modeling with the data obtained is progressing, we are expecting to arrive at the empirical mathematical model soon and will be integrated in to the simulated Gem5 Exynos5422 instance for validation and further refinement.
-
+    \medbreak
 %% ---------------------------------------------------------------------------------------------------------
-\section{ Discussion on Phase-2 outcomes}
+\section{Discussion}
 %% ---------------------------------------------------------------------------------------------------------
-    \par In terms workload execution, these workloads can get executed on any of the available CPU cores in Big and Little clusters, thereby greatly influencing the runtime performance and the power consumption behavior of the same workload. This can be a problem on accuracy of the empirical model being developed. In order avoid the same, we will be restricting execution of workloads to specific code by making use of affinity management primitives available in Linux.
+    \par In terms workload execution, these workloads can get executed on any of the available CPU cores in Big and Little clusters, thereby greatly influencing the runtime performance and the power consumption behavior of the same workload. This can be a problem on accuracy of the empirical model being developed. In order avoid the same, we will be restricting execution of workloads to specific CPU core by making use of affinity management primitives available in Linux.
 
     \par The variations in power consumption seems to be also being influenced by the CPU Dynamic Clock Performance Governors \cite{10.1145/3167132.3167198} and associated modules in Linux Performance management. We may investigate in to the influence of one or more governors on the power consumption and integrate the same in to the empirical model being developed.
+    \medbreak
+
+%% ---------------------------------------------------------------------------------------------------------
+\section{Verification Approach}
+%% ---------------------------------------------------------------------------------------------------------
+    \par Reddy et al \cite{Reddy2017EmpiricalCP} discusses about accuracy evaluation need to be done between Gem5's simulation of the CPU and actual hardware in terms of execution time and PMCs count statistics difference. The same methods shall be extended to modelled power vs actual power. \par The empirical model validation will also include standard error calculations, along with k-fold cross-validation to evaluate Mean Absolute Percentage Error (MAPE) and Root Mean Square Error (RMSE).
+    
+    \par A key observation made from the paper is that the CPU frequency levels have been locked to a specific points such as 200 MHz, 600 MHz, 1000 MHz, and 1600 MHz, and the data was compared between simulated and actual hardware. We will explore in to using the available frequency governors and unrestricted minimum and maximum frequency capping, to identify improvement areas and limitations.
+    \medbreak
 
 %% ---------------------------------------------------------------------------------------------------------
 \section{Next Step}
 %% ---------------------------------------------------------------------------------------------------------
     \par For integrating an empirical power model in to Gem5, the key features will be identified through feature engineering on obtained data-set, along with the coefficients required in to the same. The CPU model available in Gem5, will be extended to closely resemble the specification of Cortex-A15 and Cortex A-7 CPU cores.
 
-    \par With SPEC2017 workloads, further more data will be gathered covering CPU frequencies of different cores/clusters influencing power consumption, so as to improve accuracy of the power model against ODROID-XU4.
+    \par With SPEC2017 workloads, further more data will be gathered covering CPU frequencies of different cores/clusters influencing power consumption, so as to improve accuracy of the power model against ODROID-XU4, as well as identifying limitations of this approach.
+    \medbreak
 
 % ------------------------------------------------------------------------------
 % Reference and Cited Works
