@@ -58,22 +58,24 @@ vaisakhp@iisc.ac.in}
 %%    - existing work in the domain etc. 
 \section{Background}
 %% ---------------------------------------------------------------------------------------------------------
+    \par Power consumption is one of the key performance indices of any embedded or mobile device which operate of power budget, as this directly impacts on user experience and usability of any such devices. Hence, the need for accurate power models in simulation environment has increased as well, to enable designer and manufacturers to measure the impact of any new functionality or optimization that is being prototyped. Insights from such models, will allow all key stakeholders in an embedded product development arena for evaluation without waiting hardware fabrication and rollout, there by saving resources and investment.
 
+    \par One of the main motivations for this project is the top-down power modeling approach\cite{Reddy2017EmpiricalCP} that utilized Performance Monitoring Counters(PMCs) in an actual hardware along with overall power consumption data to develop an empirical power model in Gem5 simulator\cite{10.1145/2024716.2024718}. The average error achieved by this approach is claimed to be less than 6\%. We will further explore in to additional enhancement over this said approach by factoring in additional CPU performance metrics.
 
 %% ---------------------------------------------------------------------------------------------------------
+%% Covers Methodology, development strategy, data gathering approaches etc.
 \section{Methodology}
 %% ---------------------------------------------------------------------------------------------------------
-    \par As mentioned in previous work \cite{Reddy2017EmpiricalCP}, a similar method is followed, wherein a ODROID-XU4\cite{odroid-xu4} Big-Little development board is chosen as first target for experimentation, data gathering and validation efforts. An overview of this hardware is show in Figure. \ref{fig-odroid-hwoverview}. 
+    \par As mentioned in previous work \cite{Reddy2017EmpiricalCP}, a similar method is followed in developing a Top-down Power model that will be integrated in to Gem5. ODROID-XU4\cite{odroid-xu4} Big-Little development board is chosen as first target for experimentation, data gathering and validation efforts. An overview of this hardware is show in Figure. \ref{fig-odroid-hwoverview}. ODROID-XU4 offers minimalistic development platform with a Samsung Exynos 5422 Octa ARM Cortex™-A15 Quad 2GHz and Cortex™-A7 Quad 1.3GHz CPUs, with a 2GB LPDDR3 RAM operating at 933MHz stacked along with CPU package. Both Cortex-A15 and Cortex-A7 cores has 32KB Instruction and Data caches each. For L2 cache, the Cortex-A15 and Cortex-A7 cores makes use of 2MB and 512 KB respectively.
 
-    \begin{figure}[b]
+    \begin{figure}[bh]
         \includegraphics{rsrc/201506191222574523.png}
         \caption{ODroid XU4 board overview}
         \label{fig-odroid-hwoverview}
     \end{figure}
-    
-    \subsection{Data Gathering}
-        \par test
 
+    \subsection{Modeling and Development Strategy}
+        \par Simulation of the ODROID-XU4/Exynos5422 will be integrated in to Gem5, that would closely resemble its CPU operating parameters. A SmartPower3 \cite{odroid-smartpower3}, power monitor unit will be used along ODROID-XU4 as represented in Figure. \ref{fig-Experiment-setup}, to measure overall power consumption on the hardware, while most of the peripheral modules on it will be kept to reduce any variation or impact on the measured data. In addition, the perf\cite{2015137} will be used to gather PMC data-points. A summary of data-points being gathered for this modeling exercise is listed in Table \ref{Power-Perf-data-gathered}.
 
         \begin{figure}[t]
             \centering
@@ -106,6 +108,8 @@ vaisakhp@iisc.ac.in}
                 \label{Power-Perf-data-gathered}
             \end{center}
         \end{table}
+
+        \par A set of preliminary workloads that would induce resource load for CPU and memory will be executed on the ODROID-XU4 device, while the power consumption and PMC data are simultaneously recorded. Few of the workloads that are being considered as listed in Table \ref{Workload-listing}. As of now, a total of 5 workloads have been employed. Furthermore, integration of SPEC2017 will allow inclusion of up to 43 feasible benchmarks to improve quantity of data.
 
         \begin{table}[htbp]
             \caption{List of workloads being used for data gathering and validation}
