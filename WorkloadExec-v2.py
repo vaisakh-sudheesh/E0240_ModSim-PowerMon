@@ -130,6 +130,10 @@ class Workloads:
     __perf_stat_cmd_sampling_options='-I 100 '
     __perf_stat_cmd_cpu_options='-a' 
     __perf_stat_cmd_repeat_options='-r ' 
+    __task_cmd_prefix='taskset '
+    __task_cmd_option_bigcores=' -c 4-7 '
+    __task_cmd_option_littlecores=' -c 0-3 '
+
     ## Perf events to be monitored.
     __perf_event_listing=\
             'branch-instructions,branch-misses,branch-load-misses,branch-loads,'\
@@ -147,11 +151,16 @@ class Workloads:
             'devfreq:devfreq_frequency,devfreq:devfreq_monitor,'\
             'power:clock_set_rate'
 
-    def __init__(self, workloads:[WorkloadRecord], iterations:int) -> None:
+    def __init__(self, workloads:[WorkloadRecord], iterations:int, set_bigcore:bool) -> None:
         """Constructor, initialized with list of workloads"""
         self.__workload_count = len(workloads)
         self.__workloads = []
         self.__resultsfile = []
+        if (set_bigcore == True):
+            taskset_cmd = self.__task_cmd_prefix + self.__task_cmd_option_bigcores 
+        else:
+            taskset_cmd = self.__task_cmd_prefix + self.__task_cmd_option_littlecores
+
         for item in workloads:
             results_file = 'results/'+item.name()+'.prof'
             workload_cmd_temp = self.__perf_stat_cmd_prefix +' '\
@@ -160,6 +169,7 @@ class Workloads:
                             + self.__perf_stat_cmd_cpu_options +' '\
                             + self.__perf_stat_cmd_repeat_options + str(iterations) +' '\
                             + '-e ' + self.__perf_event_listing +' '\
+                            + taskset_cmd + ' '\
                             + item.cmd()
             self.__workloads.append(workload_cmd_temp)
             self.__resultsfile.append(results_file)
@@ -272,7 +282,7 @@ class WorkloadManager:
 
 
 if __name__ == '__main__':
-    enable_stress_workloads = False
+    enable_stress_workloads = True
     enable_compress_workloads = True
     enable_encode_workloads = True
     
@@ -282,20 +292,20 @@ if __name__ == '__main__':
     ###################### Stress workloads - BEGIN ######################
     if (enable_stress_workloads == True):
         ### ------------ CPU Only workloads ------------ 
-        workload_listing.append(WorkloadRecord('stress-1cpu-50s', 'stress','-c 1 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-2cpu-50s', 'stress','-c 2 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-3cpu-50s', 'stress','-c 3 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-4cpu-50s', 'stress','-c 4 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-cpu1-100s', 'stress','-c 1 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu2-100s', 'stress','-c 2 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu3-100s', 'stress','-c 3 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu4-100s', 'stress','-c 4 -t 100s'))
         ### ------------ IO Only workloads ------------ 
-        workload_listing.append(WorkloadRecord('stress-1io-50s', 'stress','-i 1 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-2io-50s', 'stress','-i 2 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-3io-50s', 'stress','-i 3 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-4io-50s', 'stress','-i 4 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-io1-100s', 'stress','-i 1 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-io2-100s', 'stress','-i 2 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-io3-100s', 'stress','-i 3 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-io4-100s', 'stress','-i 4 -t 100s'))
         ### ------------  CPU & IO Only workloads ------------ 
-        workload_listing.append(WorkloadRecord('stress-1cpuio-50s', 'stress','-c 1 -i 1 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-2cpuio-50s', 'stress','-c 2 -i 2 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-3cpuio-50s', 'stress','-c 3 -i 3 -t 50s'))
-        workload_listing.append(WorkloadRecord('stress-4cpuio-50s', 'stress','-c 4 -i 4 -t 50s'))
+        workload_listing.append(WorkloadRecord('stress-cpu_io1-100s', 'stress','-c 1 -i 1 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu_io2-100s', 'stress','-c 2 -i 2 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu_io3-100s', 'stress','-c 3 -i 3 -t 100s'))
+        workload_listing.append(WorkloadRecord('stress-cpu_io4-100s', 'stress','-c 4 -i 4 -t 100s'))
     ###################### Stress workloads - END   ######################
 
     #################### Compression Workloads - BEGIN   ####################
@@ -306,7 +316,7 @@ if __name__ == '__main__':
         workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k -f enwik8'))
         workload_listing.append(WorkloadRecord('xz-webster','xz','-k -f webster'))
         ## This seems to be extremely heavy & time consuming workload - for now disabling
-        # workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
+        workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
     #################### Compression Workloads - END     ####################
 
     ############## FFMPEG Encode/Decode Workloads - BEGIN   ##################
@@ -318,7 +328,7 @@ if __name__ == '__main__':
     ############## FFMPEG Encode/Decode Workloads - END     ##################
     
     ## Compile the workload list & initialize the job
-    workloads_obj = Workloads(workload_listing, 3)
+    workloads_obj = Workloads(workload_listing, iterations=10, set_bigcore=True)
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
                         dev_pass = 'odroid',
