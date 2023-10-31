@@ -111,3 +111,22 @@ numpages = {7}
   keywords = {perf, Linux perf, PMU, perf event, perf record, perf stat, perf timechart, perf_event_open},
   abstract = {This chapter focuses on the Linux kernel’s performance event infrastructure. This includes both the API exposed by the kernel through the perf_event_open(2) syscall, as well as the popular perf tool, which utilizes this API for performance profiling.}
 }
+
+
+@inproceedings{10.1145/3167132.3167198,
+  author = {Scordino, Claudio and Abeni, Luca and Lelli, Juri},
+  title = {Energy-Aware Real-Time Scheduling in the Linux Kernel},
+  year = {2018},
+  isbn = {9781450351911},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3167132.3167198},
+  doi = {10.1145/3167132.3167198},
+  abstract = {The recent changes made in the Linux kernel aim at achieving better energy efficiency through a tighter integration between the CPU scheduler and the frequency-scaling subsystem. However, in the current implementation, the frequency scaling mechanism is used only when there are no real-time tasks in execution. This paper shows how the deadline scheduler and the cpufreq subsystem can be extended to relax this constraint and implement an energy-aware real-time scheduling algorithm. In particular, we describe the design issues encountered when implementing the GRUB-PA algorithm on a real operating system like Linux. A set of experimental results on a multi-core ARM platform validate the effectiveness of the proposed implementation.},
+  booktitle = {Proceedings of the 33rd Annual ACM Symposium on Applied Computing},
+  pages = {601–608},
+  numpages = {8},
+  keywords = {linux, power-aware scheduling, DVFS, real-time scheduling},
+  location = {Pau, France},
+  series = {SAC '18}
+}

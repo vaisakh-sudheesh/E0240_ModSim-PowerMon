@@ -43,7 +43,7 @@ vaisakhp@iisc.ac.in}
 \maketitle
 
 \begin{abstract}
-    This document serves as phase-1 report for E0-240 - Modeling and Simulation course project delivery. The main objective of this project is to apply concepts learned in E0-240 course in to Modeling and simulation of a real-world system, which in this case is Multi-core, Heterogenous CPU. This project, will focus on developing a Power Consumption Model for simulated Full-System \cite{8718630} under varying workloads. This model will be developed taking in consideration various operating conditions of the CPU such as Dynamic Frequency Scaling, Heterogenous Cores \cite{arm-big.little-whitepaper}
+    Phase-2 report for E0-240 - Modeling and Simulation course project. The main objective of this project is to apply concepts learned in E0-240 course in to Modeling and simulation of a real-world system, which in this case is Multi-core, Heterogenous CPU. This project, will focus on developing a Power Consumption Model for simulated Full-System \cite{8718630} under varying workloads. This model will be developed taking in consideration various operating conditions of the CPU such as Dynamic Frequency Scaling, Heterogenous Cores \cite{arm-big.little-whitepaper}
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -91,7 +91,7 @@ vaisakhp@iisc.ac.in}
                     \hline
                     \textbf{Statistics}&\multicolumn{2}{|c|}{\textbf{Feature details}} \\
                     \cline{2-3} 
-                    \textbf{Type} & \multicolumn{1}{|c|}{\textbf{\textit Source}} & \multicolumn{1}{|c|}{\textbf{\textit Details}} \\
+                    \textbf{Type} & \multicolumn{1}{|c|}{\textbf{\textit{Source}}} & \multicolumn{1}{|c|}{\textbf{\textit{Details}}} \\
                     \hline
                     CPU Clock Cycles  & perf\cite{2015137}  & CPU cycles, us cycles, instructions, CPU frequency, CPU idle state statistics \\
                     \hline
@@ -113,19 +113,19 @@ vaisakhp@iisc.ac.in}
         \begin{table}[htbp]
             \caption{List of workloads being used for data gathering and validation}
             \begin{center}
-                \begin{tabular}{|c|p{4cm}|c|}
+                \begin{tabular}{|c|p{4cm}|p{1cm}|}
                     \hline
                     \textbf{Workload}&\multicolumn{2}{|c|}{\textbf{Workload details and status  of integration}} \\
                     \cline{2-3} 
-                    \textbf{Type} & \multicolumn{1}{|c|}{\textbf{\textit Workloads}} & \textbf{\textit{Status}} \\
+                    \textbf{Type} & \multicolumn{1}{|c|}{\textbf{\textit{Workloads}}} & \multicolumn{1}{|c|}{\textbf{\textit{Integrated}}}  \\
                     \hline
-                    Stress Test & stress command \cite{linux-stress-testing} & $\checkmark$ \\
+                    Stress Test & stress command \cite{linux-stress-testing} & \multicolumn{1}{|c|}{$\checkmark$} \\
                     \hline
-                    Video Encoding & ffmpeg encode \cite{linux-stress-testing} & $\checkmark$ \\
+                    Video Encoding & ffmpeg encode \cite{linux-stress-testing} & \multicolumn{1}{|c|}{$\checkmark$} \\
                     \hline
-                    File Compression & gzip, bzip2, xz on complex datasets \cite{compression-benchmarking} & $\checkmark$ \\
+                    File Compression & gzip, bzip2, xz on complex datasets \cite{compression-benchmarking} & \multicolumn{1}{|c|}{$\checkmark$} \\
                     \hline
-                    Benchmark Suite & SPEC2017 CPU Benchmarks \cite{10.1145/3185768.3185771} & Planned \\
+                    Benchmark Suite & SPEC2017 CPU Benchmarks \cite{10.1145/3185768.3185771} & \multicolumn{1}{|c|}{\textit{Planned}} \\
                     \hline
                 \end{tabular}
                 \label{Workload-listing}
