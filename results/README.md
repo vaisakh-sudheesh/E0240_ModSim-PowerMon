@@ -3,3 +3,4 @@
 | Results Directory Name  | Description/Notes                                                   |
 | ----------------------- | ------------------------------------------------------------------- |
 | 10-30-2023_11-58-22     | Stress workload with CPU and IO  operations for a duration of 100seconds and 10 iterations each <ul><li>**stress-\<x\>-cpu**: CPU-only stress workload</li><li>**stress-\<x\>-io**: IO-only stress workload</li><li>**stress-\<x\>-cpuio**: CPU+IO stress workload</li></ul>|
+| 10-31-2023_11-00-33     |  3 Iterations of each test: <ul><li>**stress-\<x\>**: Stress workload with CPU and IO  operations for a duration of 100seconds of CPU & IO stress load mix</li><li>**gzip\|bzip2\|xz-\<x\>**: Compression workloads of each algorithm</li><li>**ffmpeg-\<res\>-\<x\>**: FFMPEG encoding workloads of 320p and 720p videos</li></ul>|
