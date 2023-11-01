@@ -328,7 +328,7 @@ if __name__ == '__main__':
     ############## FFMPEG Encode/Decode Workloads - END     ##################
     
     ## Compile the workload list & initialize the job
-    workloads_obj = Workloads(workload_listing, iterations=10, set_bigcore=True)
+    workloads_obj = Workloads(workload_listing, iterations=10, set_bigcore=False)
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
                         dev_pass = 'odroid',
