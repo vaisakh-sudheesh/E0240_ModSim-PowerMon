@@ -127,7 +127,7 @@ class Workloads:
     # Perf Command options breakdown
     __perf_stat_cmd_prefix='sudo perf stat'
     __perf_stat_cmd_result_options='--summary -o '
-    __perf_stat_cmd_sampling_options='-I 100 '
+    __perf_stat_cmd_sampling_options='-I 50 '
     __perf_stat_cmd_cpu_options='-a' 
     __perf_stat_cmd_repeat_options='-r ' 
     __task_cmd_prefix='taskset '
@@ -148,6 +148,10 @@ class Workloads:
             'dTLB-load-misses,dTLB-store-misses,iTLB-load-misses,'\
             'power:cpu_frequency,power:cpu_frequency_limits,'\
             'power:cpu_idle,power:cpu_idle_miss,'\
+            'power:power_domain_target,power:powernv_throttle,'\
+            'thermal:cdev_update,thermal:thermal_power_cpu_get_power_simple,'\
+            'thermal:thermal_power_cpu_limit,thermal:thermal_temperature,'\
+            'thermal:thermal_zone_trip,thermal_pressure:thermal_pressure_update,'\
             'devfreq:devfreq_frequency,devfreq:devfreq_monitor,'\
             'power:clock_set_rate'
 
@@ -280,15 +284,39 @@ class WorkloadManager:
                 ## Fetch results from remote
                 self.__ssh_fabric_con.get('bench-data/'+result, results_dir+'/'+os.path.basename(result))
 
+    def reboot_device (self)-> None:
+        self.__ssh_fabric_con.run('reboot',warn=True)
+        self.__ssh_fabric_con.close()
+        while (True):
+            try:
+                # time.sleep(60)
+                result = self.__ssh_fabric_con.run('echo -n')
+                if result.return_code == 0:
+                    print('--Complete--')
+                    break
+            except:
+                print ('.', end ="")
 
-if __name__ == '__main__':
-    enable_stress_workloads = True
-    enable_compress_workloads = True
-    enable_encode_workloads = True
-    
-    workload_listing = []
+
+    def setup_frequencies (self,cpufreq:int)-> None:
+        # Setting Big Cor frequencies - will add governor configurations later
+        self.__ssh_fabric_con.run('echo \''+str(cpufreq)+'\'> /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq')
+
+    def cleanup (self)-> None:
+        # Clean the old files - if any
+        with self.__ssh_fabric_con.cd('bench-data/'):
+            self.__ssh_fabric_con.run ('rm -rf *')
+
+## --------------------------------------------    
+def Run_Workload(test_desc_suffix:str,
+                 cpu_freq:int = 2000000,
+                 iteration_count:int = 10,
+                 enable_stress_workloads:bool = True, 
+                 enable_compress_workloads:bool = True, 
+                 enable_encode_workloads:bool = True                 
+                 ) -> None:
     ## List out the workloads
-    
+    workload_listing = []
     ###################### Stress workloads - BEGIN ######################
     if (enable_stress_workloads == True):
         ### ------------ CPU Only workloads ------------ 
@@ -315,7 +343,6 @@ if __name__ == '__main__':
         workload_listing.append(WorkloadRecord('gzip-webster','gzip','-k -f webster'))
         workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k -f enwik8'))
         workload_listing.append(WorkloadRecord('xz-webster','xz','-k -f webster'))
-        ## This seems to be extremely heavy & time consuming workload - for now disabling
         workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
     #################### Compression Workloads - END     ####################
 
@@ -328,7 +355,7 @@ if __name__ == '__main__':
     ############## FFMPEG Encode/Decode Workloads - END     ##################
     
     ## Compile the workload list & initialize the job
-    workloads_obj = Workloads(workload_listing, iterations=10, set_bigcore=False)
+    workloads_obj = Workloads(workload_listing, iterations=iteration_count, set_bigcore=True)
     workloads = WorkloadManager(dev_ipaddr='192.168.0.101',
                         dev_user = 'root',
                         dev_pass = 'odroid',
@@ -336,7 +363,7 @@ if __name__ == '__main__':
                         )
     
     ## Time stamp to segregate test runs
-    test_run_name= datetime.datetime.now().strftime('%m-%d-%Y_%H-%M-%S')
+    test_run_name= datetime.datetime.now().strftime('%m-%d-%Y_%H-%M-%S_'+test_desc_suffix)
     print (test_run_name)
 
     ## Create top level results directory
@@ -351,9 +378,60 @@ if __name__ == '__main__':
     if (os.path.exists(results_path) == False):
         os.mkdir(results_path)
 
-    workload_data = os.path.join(parent_dirname,'data')
-    workloads.push_dependent_files(workload_data)
-    ## Execute the workload and gather results
-    workloads.batch_execute(results_dirname)
-    
+    ###########################################################################
+    # 1) Push required files to device
+    # 2) Issue reboot to device
+    # 3) Wait for device to be booted up, wait for 5 minutes, for things to settle
+    # 4) Setup device - governors, CPU frequency configurations
+    # 5) Wait for 2 minutes
+    # 6) Run Workload & pull tar.bz2 results
+    # 7) cleanup & go to step#2 until workload list/precondition list in empty
+    ###########################################################################
 
+    workload_data = os.path.join(parent_dirname,'data')
+    print('Pushing dependant files')
+    
+    ### Step-1
+    workloads.push_dependent_files(workload_data)
+    print('File push completed, waiting for few seconds...')
+    time.sleep(5)
+
+    ## Step-2
+    print('Rebooting device...')
+    print('Waiting for device to be online...')
+    workloads.reboot_device()
+    print('Device back online...')
+
+    ## Step-3
+    print('Waiting for 5 mins...')
+    time.sleep(5*60)
+    print('Device Online & setting up frequency to '+str(cpu_freq))
+    workloads.setup_frequencies(cpu_freq)
+    
+    print('Waiting for 2 mins...')
+    time.sleep(2*60)
+    
+    # ## Execute the workload and gather results
+    print('Initiating workloads')
+    workloads.batch_execute(results_dirname)
+
+    print('Workloads completed, cleanup and reboot...')
+    workloads.cleanup()
+
+    ## Cleanup
+    del workloads
+    del workloads_obj
+    del workload_listing
+
+## ----------------------------------------------------------------------------
+# For now just sticking to performance governor, not schedutil governor
+bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
+
+if __name__ == '__main__':
+    test_desc_prefix='BigCore-10itr-50msSmplg'
+    for freq in bigcore_freq_list:
+        test_desc_composed=test_desc_prefix+'-CPUFreq-'+str(freq/1000000)+'GHz'
+        Run_Workload(test_desc_composed, cpu_freq=freq, iteration_count=10,
+                     enable_stress_workloads= True,
+                     enable_compress_workloads = False,
+                     enable_encode_workloads = False )
