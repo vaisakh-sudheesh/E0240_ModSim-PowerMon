@@ -81,18 +81,18 @@ def Run_Scenario(test_desc_suffix:str,
     if (os.path.exists(results_path) == False):
         os.mkdir(results_path)
 
+    ## Need not reboot for each measurement, lets measure continously without reboot
+    print('Rebooting device...\nWaiting for device to be online...')
+    scenario_exec.reboot_device()
+    print('Device back online...\n Waiting for 5 mins to avoid initial measurement noise...')
+    wait_s = 5*60
+    sleep1_pbar = tqdm.tqdm(range(wait_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
+    sleep1_pbar.set_description("Waiting")
+    for i in sleep1_pbar:
+        time.sleep(1)
+
     itr_ctr = 1
     while (itr_ctr <= iteration_count):
-        print('Rebooting device...\nWaiting for device to be online...')
-        scenario_exec.reboot_device()
-
-        print('Device back online...\n Waiting for 5 mins to avoid initial measurement noise...')
-        wait_s = 5*60
-        sleep1_pbar = tqdm.tqdm(range(wait_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
-        sleep1_pbar.set_description("Waiting")
-        for i in sleep1_pbar:
-            time.sleep(1)
-
         print('Device Online & setting up frequency to '+str(cpu_freq))
         scenario_exec.setup_frequencies(cpu_freq)
 
@@ -106,9 +106,10 @@ def Run_Scenario(test_desc_suffix:str,
         # ## Execute the scenario and gather results
         print('Initiating Idling ')
         scenario_exec.execute(result = 'idle-itr-'+str(itr_ctr),results_dir=results_dirname, idling_period_s = idling_period_s)
-        print('Idle measurement completed, cleanup and reboot...')
-
+        
         itr_ctr += 1
+
+    print('Idle measurement completed, cleanup...')
 
 
 ## ----------------------------------------------------------------------------
@@ -116,8 +117,9 @@ def Run_Scenario(test_desc_suffix:str,
 bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
 
 if __name__ == '__main__':
-    iterations = 10
-    test_desc_prefix='Idling-BigCore-'+str(iterations)+'itr-50msSmplg-'
+    iterations = 3
+    idling_period = 5*60
+    test_desc_prefix='Idling-'+str(iterations)+'itr-idle'+str(idling_period)+'s-50msSmplg-'
     for freq in bigcore_freq_list:
-        test_desc_composed=test_desc_prefix+'CPUFreq-'+str(freq/1000000)+'GHz'
-        Run_Scenario(test_desc_suffix=test_desc_composed, cpu_freq=freq, idling_period_s = (10*60), iteration_count=iterations)
+        test_desc_composed=test_desc_prefix+'BigCoreFreq-'+str(freq/1000000)+'GHz'
+        Run_Scenario(test_desc_suffix=test_desc_composed, cpu_freq=freq, idling_period_s = (idling_period), iteration_count=iterations)
