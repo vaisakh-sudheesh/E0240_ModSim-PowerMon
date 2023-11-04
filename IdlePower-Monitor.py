@@ -29,10 +29,7 @@ class IdlePowerMonitor:
         ## Start sampling via SmartPower3
         print('Initiating Idling for '+str(idling_period_s)+' seconds')
         self.__powerMonSampler.StartSampling(results_dir+'/'+os.path.basename(result)+'.powdata')
-        pbar = tqdm.tqdm(range(idling_period_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
-        pbar.set_description("Idling")
-        for i in pbar:
-            time.sleep(1)
+        sleep_progress(timeout_s = idling_period_s)
         ## Stop power data sampling from SmartPower3
         self.__powerMonSampler.StopSampling()
 
@@ -57,6 +54,12 @@ class IdlePowerMonitor:
 
 
 scenario_exec = IdlePowerMonitor(dev_ipaddr='192.168.0.101', dev_user = 'root', dev_pass = 'odroid')
+
+def sleep_progress(timeout_s:int ) -> None:
+    sleep1_pbar = tqdm.tqdm(range(timeout_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
+    sleep1_pbar.set_description("Waiting")
+    for i in sleep1_pbar:
+        time.sleep(1)
 
 ## --------------------------------------------
 def Run_Scenario(test_desc_suffix:str, 
@@ -85,11 +88,7 @@ def Run_Scenario(test_desc_suffix:str,
     print('Rebooting device...\nWaiting for device to be online...')
     scenario_exec.reboot_device()
     print('Device back online...\n Waiting for 5 mins to avoid initial measurement noise...')
-    wait_s = 5*60
-    sleep1_pbar = tqdm.tqdm(range(wait_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
-    sleep1_pbar.set_description("Waiting")
-    for i in sleep1_pbar:
-        time.sleep(1)
+    sleep_progress(timeout_s = 5*60)
 
     itr_ctr = 1
     while (itr_ctr <= iteration_count):
@@ -97,11 +96,7 @@ def Run_Scenario(test_desc_suffix:str,
         scenario_exec.setup_frequencies(cpu_freq)
 
         print('Waiting for 1 min, prior to measurement...')
-        wait_s = 1*60
-        sleep2_pbar = tqdm.tqdm(range(wait_s), bar_format='{desc} {percentage:3.0f}%|{bar}|{remaining} seconds')
-        sleep2_pbar.set_description("Waiting")
-        for i in sleep2_pbar:
-            time.sleep(1)
+        sleep_progress(timeout_s = 1*60)
 
         # ## Execute the scenario and gather results
         print('Initiating Idling ')
