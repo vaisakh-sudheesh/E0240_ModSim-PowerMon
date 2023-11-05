@@ -426,8 +426,7 @@ def Run_Workload(test_desc_suffix:str,
 
 ## ----------------------------------------------------------------------------
 # For now just sticking to performance governor, not schedutil governor
-bigcore_freq_list = [##2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 
-                     1300000 , 1200000 ]
+bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
 
 if __name__ == '__main__':
     test_desc_prefix='BigCore-10itr-50msSmplg'
