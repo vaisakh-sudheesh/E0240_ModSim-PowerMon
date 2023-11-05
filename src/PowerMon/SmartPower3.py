@@ -37,7 +37,7 @@ class NCSampler:
         self.write = None
         self.sampling_thread = None
 
-    def __del__(self, __name: str) -> None:
+    def __del__(self) -> None:
         print('Cleaning NC')
         self.sock.shutdown()
         self.sock.close()
