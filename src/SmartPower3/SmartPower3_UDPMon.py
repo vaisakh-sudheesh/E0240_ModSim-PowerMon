@@ -49,12 +49,14 @@ class SmartPower3_NCSampler:
     Ref: https://wiki.odroid.com/accessory/power_supply_battery/smartpower3#logging_protocol
     """
     pd_col_info = [
-                    'utctime',
-                    'sm_mstime',
-                    'ps_ippwr-volts_mV','ps_ippwr-ampere_mA','ps_ippwr-watt_mW','ps_ippwr-status_b',
-                    'dev_ippwr-ch0-volts_mV', 'dev_ippwr-ch0-ampere_mA', 'dev_ippwr-ch0-watt_mW', 'dev_ippwr-ch0-status_b', 'dev_ippwr-ch0-interrupts',
-                    'dev_ippwr-ch1-volts_mV', 'dev_ippwr-ch1-ampere_mA','dev_ippwr-ch1-watt_mW', 'dev_ippwr-ch1-status_b', 'dev_ippwr-ch1-interrupts',
-                    'crc8-2sc', 'crc8-xor'
+      'utctime',
+      'sm_mstime',
+      'ps_ippwr-volts_mV','ps_ippwr-ampere_mA','ps_ippwr-watt_mW','ps_ippwr-status_b',
+      'dev_ippwr-ch0-volts_mV', 'dev_ippwr-ch0-ampere_mA', 'dev_ippwr-ch0-watt_mW', 
+          'dev_ippwr-ch0-status_b', 'dev_ippwr-ch0-interrupts',
+      'dev_ippwr-ch1-volts_mV', 'dev_ippwr-ch1-ampere_mA','dev_ippwr-ch1-watt_mW',
+          'dev_ippwr-ch1-status_b', 'dev_ippwr-ch1-interrupts',
+      'crc8-2sc', 'crc8-xor'
     ]
     
     def __init__(self) -> None:
