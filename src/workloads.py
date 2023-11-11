@@ -205,9 +205,9 @@ class WorkloadBase:
         self.__perfmemctrl__.set_governor_perf()
         self.__perfmemctrl__.set_boost_max_freq()
 
-        print('Waiting for 5 mins...')
-        # time.sleep(5*60)
-        # print ('__pre_run__: '+ tc_opres_file + ' @'+str(cpu_freq))
+        print('Waiting for 2 mins...')
+        time.sleep(2*60)
+        print ('__pre_run__: '+ tc_opres_file + ' @'+str(cpu_freq))
 
         ## Start the data samplers
         self.__sm3__.StartSampling(self.__results_path__+'/'+os.path.basename(tc_opres_file) +'.powdata')
