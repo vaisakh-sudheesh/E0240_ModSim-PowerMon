@@ -69,7 +69,6 @@ class ProcStatSampler:
 #### ==========================================================================
 #### Test Code
 if __name__ == '__main__':
-    import time
     conn = fabric.Connection( '192.168.0.101', port=22, user='root', connect_kwargs={'password':'odroid'})
     procstat = ProcStatSampler(conn)
     
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     ##TODO: Add assertion for testing csv formatted data of N number of fields
 
     procstat_cpu = procstat.sample_data()
-    print(procstat.sample_data())
+    print(procstat_cpu)
     
     ##TODO: Add assertion for testing csv formatted data of N number of fields
     
