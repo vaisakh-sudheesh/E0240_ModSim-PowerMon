@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import fabric
-import datetime
 import re
 
 class ProcStatSampler:
@@ -40,8 +39,6 @@ class ProcStatSampler:
     def sample_data(self) -> [str]:
         '''Returns list of timestamp-ed(utc & local) csv strings to be recorded 
         '''
-        ts_utc   = datetime.datetime.utcnow()
-        ts_local = datetime.datetime.now()
         cpustat  = self.__conn__.run('cat /proc/stat', hide='stdout')
         
         if cpustat:
