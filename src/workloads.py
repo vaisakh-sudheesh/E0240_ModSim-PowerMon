@@ -255,16 +255,16 @@ class CPUIntensiveWorkloads(WorkloadBase):
             self.workload_listing.append(WorkloadRecord('stress-cpu2-100s', 'stress','-c 2 -t 100s'))
             self.workload_listing.append(WorkloadRecord('stress-cpu3-100s', 'stress','-c 3 -t 100s'))
             self.workload_listing.append(WorkloadRecord('stress-cpu4-100s', 'stress','-c 4 -t 100s'))
-            # ### ------------ IO Only workloads ------------ 
-            # self.workload_listing.append(WorkloadRecord('stress-io1-100s', 'stress','-i 1 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-io2-100s', 'stress','-i 2 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-io3-100s', 'stress','-i 3 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-io4-100s', 'stress','-i 4 -t 100s'))
-            # ### ------------  CPU & IO Only workloads ------------ 
-            # self.workload_listing.append(WorkloadRecord('stress-cpu_io1-100s', 'stress','-c 1 -i 1 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-cpu_io2-100s', 'stress','-c 2 -i 2 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-cpu_io3-100s', 'stress','-c 3 -i 3 -t 100s'))
-            # self.workload_listing.append(WorkloadRecord('stress-cpu_io4-100s', 'stress','-c 4 -i 4 -t 100s'))
+            ### ------------ IO Only workloads ------------ 
+            self.workload_listing.append(WorkloadRecord('stress-io1-100s', 'stress','-i 1 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-io2-100s', 'stress','-i 2 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-io3-100s', 'stress','-i 3 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-io4-100s', 'stress','-i 4 -t 100s'))
+            ### ------------  CPU & IO Only workloads ------------ 
+            self.workload_listing.append(WorkloadRecord('stress-cpu_io1-100s', 'stress','-c 1 -i 1 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-cpu_io2-100s', 'stress','-c 2 -i 2 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-cpu_io3-100s', 'stress','-c 3 -i 3 -t 100s'))
+            self.workload_listing.append(WorkloadRecord('stress-cpu_io4-100s', 'stress','-c 4 -i 4 -t 100s'))
         ###################### Stress workloads - END   ######################
 
         #################### Compression Workloads - BEGIN   ####################
