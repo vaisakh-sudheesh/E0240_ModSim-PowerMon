@@ -34,7 +34,6 @@ class NCSampler:
         self.sock.setblocking(0)
         self.bExit = False
         self.f = None
-        self.write = None
         self.sampling_thread = None
 
     def __del__(self) -> None:
