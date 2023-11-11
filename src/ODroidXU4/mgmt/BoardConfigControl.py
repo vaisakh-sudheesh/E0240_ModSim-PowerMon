@@ -18,7 +18,7 @@ class BroadConfig:
         self.__bootconfig_filepath__ = '/media/boot/boot.ini'
         self.__isolconf_cmd_clear__ = 'sed -i \'s/^setenv isolcpus_list/#setenv isolcpus_list/g\' '+self.__bootconfig_filepath__
         self.__isolconf_sedcmd_bigcluster__ = 'sed -i \'s/^#\{0,1\}setenv isolcpus_list .*"/setenv isolcpus_list "4,5,6,7"/g\' '+self.__bootconfig_filepath__
-        self.__isolconf_sedcmd_littlecluster__ = 'sed -i \'s/^#\{0,1\}setenv isolcpus_list .*/setenv isolcpus_list "0,1,2,3"/g\' '+self.__bootconfig_filepath__
+        self.__isolconf_sedcmd_littlecluster__ = 'sed -i \'s/^#\{0,1\}setenv isolcpus_list .*/setenv isolcpus_list "1,2,3"/g\' '+self.__bootconfig_filepath__
 
     def set_cpuisol_bigcluster(self):
         cmd =self.__isolconf_sedcmd_bigcluster__
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print ('Change isolation config to little cluster...')
     bc.clear_cpuisol()
     bc.set_cpuisol_littlecluster()
-    assert bc.__get_next_cpuisolconf__() == '0,1,2,3', 'Failure in setting isolation configuration for next boot to little cluster'
+    assert bc.__get_next_cpuisolconf__() == '1,2,3', 'Failure in setting isolation configuration for next boot to little cluster'
     print ('Next boot isolation config: '+str(bc.__get_next_cpuisolconf__()))
     print ('Rebooting device to check effect...')
     bc.reboot_device()

@@ -62,7 +62,7 @@ class PerfStat_WorkloadCompiler:
     ## assigning to a single core than a range of CPU as --pre-core will show core-wise 
     ## analysis need to be core level 
     __task_cmd_option_bigcores=' -c 4,5,6,7 '
-    __task_cmd_option_littlecores=' -c 0,1,2,3 ' 
+    __task_cmd_option_littlecores=' -c 1,2,3 ' 
 
     ## Perf events to be monitored.
     __perf_event_listing=\
@@ -160,8 +160,10 @@ class WorkloadBase:
         # Set CPU isolation prior to reboot so that CPUs are reserved for 
         # workload execution
         if (self.__run_on_bigcore__):
+            print ('Setting Big cluster isolation')
             self.__bdctrl__.set_cpuisol_bigcluster()
         else:
+            print ('Setting Little cluster isolation')
             self.__bdctrl__.set_cpuisol_littlecluster()
 
         
@@ -185,16 +187,27 @@ class WorkloadBase:
 
     def __pre_run__(self,tc_opres_file:str,
                     cpu_freq:int = 2000000):
-        # HW Setup & necessary preconditions to be added here, which are to be done
-        # prior to starting test run
+        ## HW Setup & necessary preconditions to be added here, which are to be done
+        ## prior to starting test run
+        # Let the fan run always..
         self.__fanctrl__.switch_on()
-        self.__perfcpuctrl__.set_cluster_gov_perf(True)
-        self.__perfcpuctrl__.set_cluster_frequency(True,cpu_freq)
+        # Setup up cluster frequency for either big or little cores
+        if (self.__run_on_bigcore__):
+            print ('Setting Big cluster\'s frequency configurations')
+            self.__perfcpuctrl__.set_cluster_gov_perf(True)
+            self.__perfcpuctrl__.set_cluster_frequency(True,cpu_freq)
+        else:
+            print ('Setting Little cluster\'s frequency configurations')
+            self.__perfcpuctrl__.set_cluster_gov_perf(False)
+            self.__perfcpuctrl__.set_cluster_frequency(False,cpu_freq)
+        
+        # Setup up memory controller performance
         self.__perfmemctrl__.set_governor_perf()
         self.__perfmemctrl__.set_boost_max_freq()
+
         print('Waiting for 5 mins...')
         # time.sleep(5*60)
-        print ('__pre_run__: '+ tc_opres_file + ' @'+str(cpu_freq))
+        # print ('__pre_run__: '+ tc_opres_file + ' @'+str(cpu_freq))
 
         ## Start the data samplers
         self.__sm3__.StartSampling(self.__results_path__+'/'+os.path.basename(tc_opres_file) +'.powdata')
@@ -217,13 +230,13 @@ class WorkloadBase:
 
 class CPUIntensiveWorkloads(WorkloadBase):
     def __init__(self, conn: fabric.Connection,
-                 iteration_count:int = 3,
+                 iteration_count:int = 10,
                  run_on_bigcore: bool = True,
                  enable_stress_workloads:bool = True, 
                  enable_compress_workloads:bool = False, 
                  enable_encode_workloads:bool = False
                  ):
-        WorkloadBase.__init__(self,conn)
+        WorkloadBase.__init__(self,conn,run_on_bigcore=run_on_bigcore)
         self.workload_listing = []
         self.run_on_bigcore = run_on_bigcore
 
@@ -355,17 +368,17 @@ class Idle_WorkloadCompiler(WorkloadBase):
 
 #### ==========================================================================
 #### Test Code
-if __name__ == '__main__':
-    src_root = Path(__file__).parents[1]
-    print(src_root)
-    workload_data_dir = os.path.join(src_root,'data')
-    workload_result_dir = os.path.join(src_root,'results')
+# if __name__ == '__main__':
+#     src_root = Path(__file__).parents[1]
+#     print(src_root)
+#     workload_data_dir = os.path.join(src_root,'data')
+#     workload_result_dir = os.path.join(src_root,'results')
 
-    conn = fabric.Connection( '192.168.0.101', port=22, user='root', connect_kwargs={'password':'odroid'})
-    cpuload_wkld = CPUIntensiveWorkloads(conn)
-    cpuload_wkld.setup_persistant(workload_data=workload_data_dir, resultsdir_prefix=workload_result_dir, testname_suffix='dummy-2GHz')
-    cpuload_wkld.run( )
+#     conn = fabric.Connection( '192.168.0.101', port=22, user='root', connect_kwargs={'password':'odroid'})
+#     cpuload_wkld = CPUIntensiveWorkloads(conn)
+#     cpuload_wkld.setup_persistant(workload_data=workload_data_dir, resultsdir_prefix=workload_result_dir, testname_suffix='dummy-2GHz')
+#     cpuload_wkld.run( )
     
-    del cpuload_wkld
+#     del cpuload_wkld
 
 #### ==========================================================================
