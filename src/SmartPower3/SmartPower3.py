@@ -64,6 +64,7 @@ class NCSampler:
 
             self.sampling_thread = threading.Thread(target = self.__ProcessPacket)
             self.sampling_thread.start()
+            print ('SM3-NCSampler: thread started and logging in to '+filename)
 
     def StopSampling(self,)->None:
         self.bExit = True
@@ -71,3 +72,4 @@ class NCSampler:
         self.f.close()
         self.f = None
         self.writer = None
+        print ('SM3-NCSampler: thread stopped')

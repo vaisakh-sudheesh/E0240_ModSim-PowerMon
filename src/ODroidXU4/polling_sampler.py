@@ -68,6 +68,7 @@ class DataSampler:
 
         self.sampling_thread = threading.Thread(target = self.__poll__)
         self.sampling_thread.start()
+        print ('Polling Data: thread started and logging in to '+filename)
 
     def StopSampling(self,)->None:
         self.bExit = True
@@ -75,6 +76,7 @@ class DataSampler:
         self.f.close()
         self.f = None
         self.writer = None
+        print ('Polling Data: thread stopped')
 
 
 if __name__ == '__main__':
