@@ -318,7 +318,7 @@ class CPUIntensiveWorkloads(WorkloadBase):
     
     def run(self,
             cpu_freq:int = 2000000,
-            ) -> None:
+            ) -> str:
         
         # print (test_run_name)
         with self.__conn__.cd('bench-data/'):
@@ -341,7 +341,7 @@ class CPUIntensiveWorkloads(WorkloadBase):
 
                 ## Fetch results from remote
                 self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+os.path.basename(result))
-
+        return self.__results_path__
 
         
 
