@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import fabric
-import re
 
 class ProcStatSampler:
     '''Wrapper class for /proc/stat sampling
@@ -25,10 +24,10 @@ class ProcStatSampler:
     '''
     def __init__(self, conn: fabric.Connection):
         self.__conn__ = conn
-        self.__csv_header__ = 'stat_cpuid,'\
-                              'stat_user,stat_nice,stat_system,stat_idle,stat_iowait,'\
-                              'stat_irq,stat_steal,stat_guest,stat_guest_nice'
-        self.__csv_fieldcnt__ = len(self.__csv_header__.split(','))
+        self.__csv_header__ = ['stat_cpuid',
+                              'stat_user','stat_nice','stat_system','stat_idle','stat_iowait',
+                              'stat_irq','stat_steal','stat_guest','stat_guest_nice']
+        self.__csv_fieldcnt__ = len(self.__csv_header__)
     
     def header(self):
         '''Returns header to be used for CSV file
@@ -36,7 +35,7 @@ class ProcStatSampler:
         return self.__csv_header__
 
 
-    def sample_data(self) -> [str]:
+    def sample_data(self) -> [int]:
         '''Returns list of timestamp-ed(utc & local) csv strings to be recorded 
         '''
         cpustat  = self.__conn__.run('cat /proc/stat', hide='stdout')
@@ -46,17 +45,14 @@ class ProcStatSampler:
             res = []
             ctr = 0
             for line in cpustat_stdout:
-                csved = re.sub(' +', ',', line)
-                test_len = len(csved.split(','))
-                # validating CSV-ed CPU stats
-                assert test_len == 11, 'Processed length of elements of /proc/stat seems to be wrong as '+\
-                                        str(test_len) + ', expected 11'
-                
-                test_len = len(csved.split(','))
+                csved = line.split()
+                ## Validation
+                test_len = len(csved) -1
                 # validating final CSV length
-                assert test_len == (self.__csv_fieldcnt__ + 1), 'Final length of CSV record seems to be wrong as '\
+                assert test_len == (self.__csv_fieldcnt__), 'Final length of CSV record seems to be wrong as '\
                                             +str(test_len)+\
                                             ', expected: '+str(self.__csv_fieldcnt__)
+                ## Validation - End
                 res.append(csved)
                 # Since we are extracting only CPU time/stat entries, exit after 8 lines
                 ctr += 1
@@ -73,7 +69,7 @@ if __name__ == '__main__':
     procstat = ProcStatSampler(conn)
     
     csv_header = procstat.header()
-    print('CSV Header: '+csv_header)
+    print('CSV Header: '+str(csv_header))
     ##TODO: Add assertion for testing csv formatted data of N number of fields
 
     procstat_cpu = procstat.sample_data()
