@@ -26,7 +26,7 @@ class ProcStatSampler:
         self.__conn__ = conn
         self.__csv_header__ = ['stat_cpuid',
                               'stat_user','stat_nice','stat_system','stat_idle','stat_iowait',
-                              'stat_irq','stat_steal','stat_guest','stat_guest_nice']
+                              'stat_irq','stat_softirq', 'stat_steal','stat_guest','stat_guest_nice']
         self.__csv_fieldcnt__ = len(self.__csv_header__)
     
     def header(self):
@@ -47,7 +47,7 @@ class ProcStatSampler:
             for line in cpustat_stdout:
                 csved = line.split()
                 ## Validation
-                test_len = len(csved) -1
+                test_len = len(csved)
                 # validating final CSV length
                 assert test_len == (self.__csv_fieldcnt__), 'Final length of CSV record seems to be wrong as '\
                                             +str(test_len)+\
