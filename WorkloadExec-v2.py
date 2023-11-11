@@ -48,7 +48,7 @@ def execute_workload (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[
         # Setup the workload
         cpuload_wkld = work.CPUIntensiveWorkloads(conn,
                                 run_on_bigcore=on_bigcluster,
-                                iteration_count=3,
+                                iteration_count=5,
                                 enable_stress_workloads= True,
                                 enable_compress_workloads = True,
                                 enable_encode_workloads = True 
