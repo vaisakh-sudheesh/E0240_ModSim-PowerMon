@@ -38,7 +38,6 @@ class NCSampler:
 
     def __del__(self) -> None:
         print('Cleaning NC')
-        self.sock.shutdown()
         self.sock.close()
         
     
