@@ -61,8 +61,8 @@ class PerfStat_WorkloadCompiler:
     __task_cmd_prefix='taskset '
     ## assigning to a single core than a range of CPU as --pre-core will show core-wise 
     ## analysis need to be core level 
-    __task_cmd_option_bigcores=' -c 7 '
-    __task_cmd_option_littlecores=' -c 3 ' 
+    __task_cmd_option_bigcores=' -c 4,5,6,7 '
+    __task_cmd_option_littlecores=' -c 0,1,2,3 ' 
 
     ## Perf events to be monitored.
     __perf_event_listing=\
