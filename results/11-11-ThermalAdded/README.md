@@ -1,7 +1,8 @@
 **Commit-SHA:** 348c8030600b8773faa90d7f126b0af12bfc9daf
 
 ## Hardware configuration
-- Memory Controller max frequency
+- Memory Controller max frequency & simple_ondemand -> performance governor
+- CPU Frequency governor set to performance
 - Fan at max speed always
 - CPU Isolation
 
@@ -57,3 +58,6 @@ Frequencies
             #             '-hide_banner -loglevel warning -i \'Silent Love-720p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
         ############## FFMPEG Encode/Decode Workloads - END     ##################
 ```
+
+**Note:** 11-11-2023_20-21-43_BigCore-10itr-100msPerf-CPUFreq-2.0GHz.tar.bz2 is  gathered with full set of workloads. For remaining files, minimal set is gathered considering time-constraint.
+
