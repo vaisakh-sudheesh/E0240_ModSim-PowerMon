@@ -75,8 +75,7 @@ class PerfStat_WorkloadCompiler:
             'L1-icache-load-misses,L1-icache-loads,'\
             'LLC-load-misses,LLC-loads,LLC-store-misses,LLC-stores'
 
-    def __init__(self, workloads:[WorkloadRecord], 
-                 iterations:int, 
+    def __init__(self, workloads:[WorkloadRecord],
                  set_bigcore:bool,
                  results_prefix_dir:str='results'
                  ) -> None:
@@ -90,7 +89,7 @@ class PerfStat_WorkloadCompiler:
             taskset_cmd = self.__task_cmd_prefix + self.__task_cmd_option_littlecores
 
         for item in workloads:
-            results_file = results_prefix_dir+'/'+item.name()+'.prof'
+            results_file = results_prefix_dir+'/'+item.name()
             workload_cmd_temp = self.__perf_stat_cmd_prefix +' '\
                             + self.__perf_stat_cmd_result_options + results_file +' '\
                             + self.__perf_stat_cmd_sampling_options +' '\
@@ -350,16 +349,17 @@ class CPUIntensiveWorkloads(WorkloadBase):
                 workload_ctr += 1
                 result = workload_item[0]
                 cmd = workload_item[1]
-
-                self.__pre_run__(result, cpu_freq)
                 print ('======= Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
-                print('results file==> '+result)
-                ## Execute the workload on device
-                self.__conn__.run(cmd)
-                self.__post_run__()
+                for itr in range(1, self.iteration_count):
+                    result_name = result+'-'+str(itr)
+                    self.__pre_run__(result_name, cpu_freq)
+                    print('Iteration: '+str(itr) +', results file==> '+result_name)
+                    ## Execute the workload on device
+                    self.__conn__.run(cmd)
+                    self.__post_run__()
+                    ## Fetch results from remote
+                    self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+ os.path.basename(result_name)+'.prof')
 
-                ## Fetch results from remote
-                self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+os.path.basename(result))
         return self.__results_path__
 
         
@@ -384,9 +384,8 @@ class IdleWorkloads (WorkloadBase):
     
     def __compile_workloadlist__ (self):
         if (self.run_perf_sleep == True):
-            self.workload_listing.append(WorkloadRecord('sleep-perf', 'sleep',str(self.idle_duration)))
-            self.workloads_obj = PerfStat_WorkloadCompiler(self.workload_listing, 
-                                    iterations=self.iteration_count,
+            self.workload_listing.append(WorkloadRecord('IdleSleep-perf', 'sleep',str(self.idle_duration)))
+            self.workloads_obj = PerfStat_WorkloadCompiler(self.workload_listing,
                                     set_bigcore=self.run_on_bigcore)
     
     def setup_persistant(self,resultsdir_prefix:str,
@@ -427,15 +426,18 @@ class IdleWorkloads (WorkloadBase):
                     result = workload_item[0]
                     cmd = workload_item[1]
 
-                    self.__pre_run__('IdlingPerfSleep', cpu_freq,max_fan)
+                    
                     print ('======= Idle Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
-                    print('results file==> '+result)
-                    ## Execute the workload on device
-                    self.__conn__.run(cmd)
-                    self.__post_run__()
+                    for itr in range(1, self.iteration_count):
+                        result_name = result+'-'+str(itr)
+                        print('results file==> '+result_name)
+                        self.__pre_run__(result_name, cpu_freq,max_fan)
+                        ## Execute the workload on device
+                        self.__conn__.run(cmd)
+                        self.__post_run__()
 
-                    ## Fetch results from remote
-                    self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+os.path.basename(result))
+                        ## Fetch results from remote
+                        self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+os.path.basename(result_name)+'.prof')
         else:
             self.__pre_run__('Idling', cpu_freq,max_fan)
             sleep_progress(self.idle_duration)
