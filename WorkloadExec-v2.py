@@ -32,8 +32,10 @@ from src import workloads as work
 ## ----------------------------------------------------------------------------
 src_root = Path(__file__).parents[0]
 print(src_root)
-bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
-littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
+
+idle_bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
+idle_littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
+
 workload_data_dir = os.path.join(src_root,'data')
 workload_result_dir = os.path.join(src_root,'results')
 conn = fabric.Connection( '192.168.0.101', port=22, user='root', connect_kwargs={'password':'odroid'})
@@ -61,8 +63,25 @@ def execute_workload (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[
         shutil.move(results, workload_result_dir+'/backup/')
         del cpuload_wkld
 
+
+def execute_idle_scenario (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[int]=bigcore_freq_list ):
+    for freq in freq_list:
+        test_desc_composed=test_desc_prefix+'-CPUFreq-'+str(freq/1000000)+'GHz'
+        # Setup the workload
+        idle_wkld = work.IdleWorkloads(conn,
+                                run_on_bigcore=on_bigcluster,
+                                idle_duration=60,
+                          )
+        idle_wkld.setup_persistant(resultsdir_prefix=workload_result_dir, testname_suffix=test_desc_composed)
+        # Run the workload
+        results = idle_wkld.run(cpu_freq=freq )
+        # Tar the results folder and move the directory to backup rather than deleting it
+        make_tarfile(os.path.join(workload_result_dir, os.path.basename(results)+'.tar.bz2'),results)
+        shutil.move(results, workload_result_dir+'/backup/')
+        del idle_wkld
+
 if __name__ == '__main__':
-    execute_workload (test_desc_prefix='BigCore-10itr-100msPerf', on_bigcluster=True, freq_list= bigcore_freq_list)
-    execute_workload (test_desc_prefix='LittleCore-10itr-100msPerf', on_bigcluster=False, freq_list= littlecore_freq_list)
-    
-    
+
+    execute_idle_scenario (test_desc_prefix='Idleworkload-LittleCore-60sidle', on_bigcluster=False, freq_list= idle_littlecore_freq_list)
+    execute_idle_scenario (test_desc_prefix='Idleworkload-BigCore-60sidle', on_bigcluster=True, freq_list= idle_bigcore_freq_list)
+

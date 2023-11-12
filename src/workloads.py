@@ -17,6 +17,7 @@ from ODroidXU4.mgmt.performance.CPUFreq import CPUFreqControl as cpufreqctrl
 from ODroidXU4.mgmt.performance.MemoryController import MemCtrlrFreqControl as memfreqctrl
 from ODroidXU4.polling_sampler import DataSampler as  polling
 from SmartPower3.SmartPower3 import NCSampler as sm3
+from utils.ProgressBar import sleep_progress 
 
 class WorkloadRecord:
     """Class to hold record of workload information
@@ -361,9 +362,43 @@ class CPUIntensiveWorkloads(WorkloadBase):
 #################################################
 ##############  Idling workload(s) ##############
 #################################################
-class Idle_WorkloadCompiler(WorkloadBase):
-    def __init__(self, conn: fabric.Connection):
-        WorkloadBase.__init__(conn)
+class IdleWorkloads (WorkloadBase):
+    def __init__(self, conn: fabric.Connection,
+                 idle_duration:int = 10,
+                 run_on_bigcore: bool = True,
+                 ):
+        WorkloadBase.__init__(self,conn,run_on_bigcore=run_on_bigcore)
+        self.run_on_bigcore = run_on_bigcore
+        self.idle_duration = idle_duration
+
+    
+    def setup_persistant(self,resultsdir_prefix:str,
+                            testname_suffix:str):
+        # Calling base class for generic actions & reboot
+        WorkloadBase.__setup_persistant__(self, resultsdir_prefix, testname_suffix)
+
+    def __pre_run__(self,
+                    tc_name:str,
+                    cpu_freq:int = 2000000,
+                    ):
+        ''' Method to be exceuted prior to running CPU workloads
+        '''
+        WorkloadBase.__pre_run__(self, tc_name, cpu_freq) # Calling base class for generic actions
+
+    def __post_run__(self):
+        ''' Method to be exceuted after running CPU workloads
+        '''
+        WorkloadBase.__post_run__(self)
+    
+    def run(self,
+            cpu_freq:int = 2000000,
+            ) -> str:
+        self.__pre_run__('Idling', cpu_freq)
+        sleep_progress(self.idle_duration)
+        self.__post_run__()
+        
+        return self.__results_path__
+
 
 
 #### ==========================================================================
