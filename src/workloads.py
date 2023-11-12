@@ -187,11 +187,16 @@ class WorkloadBase:
         self.__bdctrl__.reboot_device()
 
     def __pre_run__(self,tc_opres_file:str,
-                    cpu_freq:int = 2000000):
+                    cpu_freq:int = 2000000,
+                    max_fan:bool = True
+                    ):
         ## HW Setup & necessary preconditions to be added here, which are to be done
         ## prior to starting test run
-        # Let the fan run always..
-        self.__fanctrl__.switch_on()
+        if(max_fan == True):
+            self.__fanctrl__.switch_on()
+        else:
+            self.__fanctrl__.switch_off()
+
         # Setup up cluster frequency for either big or little cores
         if (self.__run_on_bigcore__):
             print ('Setting Big cluster\'s frequency configurations')
@@ -366,11 +371,23 @@ class IdleWorkloads (WorkloadBase):
     def __init__(self, conn: fabric.Connection,
                  idle_duration:int = 10,
                  run_on_bigcore: bool = True,
+                 run_perf_sleep: bool = False,
+                 iteration_count:int = 10,
                  ):
         WorkloadBase.__init__(self,conn,run_on_bigcore=run_on_bigcore)
         self.run_on_bigcore = run_on_bigcore
         self.idle_duration = idle_duration
-
+        self.run_perf_sleep = run_perf_sleep
+        self.iteration_count = iteration_count
+        self.workload_listing = []
+        self.__compile_workloadlist__()
+    
+    def __compile_workloadlist__ (self):
+        if (self.run_perf_sleep == True):
+            self.workload_listing.append(WorkloadRecord('sleep-perf', 'sleep',str(self.idle_duration)))
+            self.workloads_obj = PerfStat_WorkloadCompiler(self.workload_listing, 
+                                    iterations=self.iteration_count,
+                                    set_bigcore=self.run_on_bigcore)
     
     def setup_persistant(self,resultsdir_prefix:str,
                             testname_suffix:str):
@@ -380,10 +397,13 @@ class IdleWorkloads (WorkloadBase):
     def __pre_run__(self,
                     tc_name:str,
                     cpu_freq:int = 2000000,
+                    max_fan:bool = True
                     ):
         ''' Method to be exceuted prior to running CPU workloads
         '''
-        WorkloadBase.__pre_run__(self, tc_name, cpu_freq) # Calling base class for generic actions
+        if (self.run_perf_sleep):
+            pass
+        WorkloadBase.__pre_run__(self, tc_name, cpu_freq, max_fan) # Calling base class for generic actions
 
     def __post_run__(self):
         ''' Method to be exceuted after running CPU workloads
@@ -392,10 +412,35 @@ class IdleWorkloads (WorkloadBase):
     
     def run(self,
             cpu_freq:int = 2000000,
+            max_fan:bool=True
             ) -> str:
-        self.__pre_run__('Idling', cpu_freq)
-        sleep_progress(self.idle_duration)
-        self.__post_run__()
+        
+        if (self.run_perf_sleep == True):
+            with self.__conn__.cd('bench-data/'):
+                ## Create results directory
+                self.__conn__.run ('mkdir -p results/')
+                workload_ctr = 0
+                total_workload = len(self.workloads_obj)
+                ## Iterate and execute each jobs
+                for workload_item in self.workloads_obj:
+                    workload_ctr += 1
+                    result = workload_item[0]
+                    cmd = workload_item[1]
+
+                    self.__pre_run__('IdlingPerfSleep', cpu_freq,max_fan)
+                    print ('======= Idle Workload ('+str(workload_ctr)+'/'+str(total_workload)+'): '+result +'=======')
+                    print('results file==> '+result)
+                    ## Execute the workload on device
+                    self.__conn__.run(cmd)
+                    self.__post_run__()
+
+                    ## Fetch results from remote
+                    self.__conn__.get('bench-data/'+result, self.__results_path__+'/'+os.path.basename(result))
+        else:
+            self.__pre_run__('Idling', cpu_freq,max_fan)
+            sleep_progress(self.idle_duration)
+            self.__post_run__()
+        
         
         return self.__results_path__
 

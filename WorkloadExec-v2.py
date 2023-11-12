@@ -32,6 +32,11 @@ from src import workloads as work
 ## ----------------------------------------------------------------------------
 src_root = Path(__file__).parents[0]
 print(src_root)
+# bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
+# littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
+
+bigcore_freq_list    = [1800000, 1600000, 1400000, 1200000]
+littlecore_freq_list = [1400000, 1200000, 1000000, 800000 ]
 
 idle_bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
 idle_littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
@@ -50,7 +55,7 @@ def execute_workload (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[
         # Setup the workload
         cpuload_wkld = work.CPUIntensiveWorkloads(conn,
                                 run_on_bigcore=on_bigcluster,
-                                iteration_count=5,
+                                iteration_count=3,
                                 enable_stress_workloads= True,
                                 enable_compress_workloads = True,
                                 enable_encode_workloads = True 
@@ -64,24 +69,40 @@ def execute_workload (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[
         del cpuload_wkld
 
 
-def execute_idle_scenario (test_desc_prefix:str, on_bigcluster:bool=True, freq_list:[int]=bigcore_freq_list ):
+def execute_idle_scenario (test_desc_prefix:str, 
+                           on_bigcluster:bool=True, 
+                           max_fan:bool=True,
+                           perf_sleep:bool=False,
+                           freq_list:[int]=bigcore_freq_list ):
     for freq in freq_list:
         test_desc_composed=test_desc_prefix+'-CPUFreq-'+str(freq/1000000)+'GHz'
         # Setup the workload
         idle_wkld = work.IdleWorkloads(conn,
                                 run_on_bigcore=on_bigcluster,
                                 idle_duration=60,
+                                run_perf_sleep=perf_sleep ,
+                                iteration_count=3 # applicable only for perf-sleep case
                           )
         idle_wkld.setup_persistant(resultsdir_prefix=workload_result_dir, testname_suffix=test_desc_composed)
         # Run the workload
-        results = idle_wkld.run(cpu_freq=freq )
+        results = idle_wkld.run(cpu_freq=freq,max_fan=max_fan )
         # Tar the results folder and move the directory to backup rather than deleting it
         make_tarfile(os.path.join(workload_result_dir, os.path.basename(results)+'.tar.bz2'),results)
         shutil.move(results, workload_result_dir+'/backup/')
         del idle_wkld
 
 if __name__ == '__main__':
+    # execute_workload (test_desc_prefix='BigCore-10itr-100msPerf', on_bigcluster=True, freq_list= bigcore_freq_list)
+    # execute_workload (test_desc_prefix='LittleCore-10itr-100msPerf', on_bigcluster=False, freq_list= littlecore_freq_list)
 
-    execute_idle_scenario (test_desc_prefix='Idleworkload-LittleCore-60sidle', on_bigcluster=False, freq_list= idle_littlecore_freq_list)
-    execute_idle_scenario (test_desc_prefix='Idleworkload-BigCore-60sidle', on_bigcluster=True, freq_list= idle_bigcore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='Idleworkload-MaxFan-LittleCore-60sidle', on_bigcluster=False,max_fan=True, freq_list= idle_littlecore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='Idleworkload-NoFan-LittleCore-60sidle', on_bigcluster=False,max_fan=False, freq_list= idle_littlecore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='Idleworkload-MaxFan-BigCore-60sidle', on_bigcluster=True, max_fan=True, freq_list= idle_bigcore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='Idleworkload-NoFan-BigCore-60sidle', on_bigcluster=True, max_fan=False, freq_list= idle_bigcore_freq_list)
+
+    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-LittleCore-20sidl10Itr', on_bigcluster=False, perf_sleep=True, max_fan=True, freq_list= idle_littlecore_freq_list)
+    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-LittleCore-20sidl10Itr', on_bigcluster=False, perf_sleep=True, max_fan=False, freq_list= idle_littlecore_freq_list)
+    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-BigCore-20sidl10Itr', on_bigcluster=True, perf_sleep=True,  max_fan=True, freq_list= idle_bigcore_freq_list)
+    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-BigCore-20sidl10Itr', on_bigcluster=True, perf_sleep=True,  max_fan=False, freq_list= idle_bigcore_freq_list)    
+
 
