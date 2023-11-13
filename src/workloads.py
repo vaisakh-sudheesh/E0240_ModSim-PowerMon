@@ -264,11 +264,11 @@ class CPUIntensiveWorkloads(WorkloadBase):
             self.workload_listing.append(WorkloadRecord('stress-io2-100s', 'stress','-i 2 -t 100s'))
             self.workload_listing.append(WorkloadRecord('stress-io3-100s', 'stress','-i 3 -t 100s'))
             self.workload_listing.append(WorkloadRecord('stress-io4-100s', 'stress','-i 4 -t 100s'))
-            ### ------------  CPU & IO Only workloads ------------ 
-            self.workload_listing.append(WorkloadRecord('stress-cpu_io1-100s', 'stress','-c 1 -i 1 -t 100s'))
-            self.workload_listing.append(WorkloadRecord('stress-cpu_io2-100s', 'stress','-c 2 -i 2 -t 100s'))
-            self.workload_listing.append(WorkloadRecord('stress-cpu_io3-100s', 'stress','-c 3 -i 3 -t 100s'))
-            self.workload_listing.append(WorkloadRecord('stress-cpu_io4-100s', 'stress','-c 4 -i 4 -t 100s'))
+            # ### ------------  CPU & IO Only workloads ------------ 
+            # self.workload_listing.append(WorkloadRecord('stress-cpu_io1-100s', 'stress','-c 1 -i 1 -t 100s'))
+            # self.workload_listing.append(WorkloadRecord('stress-cpu_io2-100s', 'stress','-c 2 -i 2 -t 100s'))
+            # self.workload_listing.append(WorkloadRecord('stress-cpu_io3-100s', 'stress','-c 3 -i 3 -t 100s'))
+            # self.workload_listing.append(WorkloadRecord('stress-cpu_io4-100s', 'stress','-c 4 -i 4 -t 100s'))
         ###################### Stress workloads - END   ######################
 
         #################### Compression Workloads - BEGIN   ####################
@@ -277,21 +277,20 @@ class CPUIntensiveWorkloads(WorkloadBase):
             self.workload_listing.append(WorkloadRecord('bzip2-enwik8','bzip2','-k -f enwik8'))
             self.workload_listing.append(WorkloadRecord('gzip-webster','gzip','-k -f webster'))
             self.workload_listing.append(WorkloadRecord('gzip-enwik8','gzip','-k -f enwik8'))
-            self.workload_listing.append(WorkloadRecord('xz-webster','xz','-k -f webster'))
-            self.workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
+            # self.workload_listing.append(WorkloadRecord('xz-webster','xz','-k -f webster'))
+            # self.workload_listing.append(WorkloadRecord('xz-enwik8','xz','-k -f enwik8'))
         #################### Compression Workloads - END     ####################
 
         ############## FFMPEG Encode/Decode Workloads - BEGIN   ##################
         if (self.enable_encode_workloads == True):
             self.workload_listing.append(WorkloadRecord('ffmpeg-360p','ffmpeg',
                         '-hide_banner -loglevel warning -i \'Silent Love-360p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
-            self.workload_listing.append(WorkloadRecord('ffmpeg-720p','ffmpeg',
-                        '-hide_banner -loglevel warning -i \'Silent Love-720p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
+            # self.workload_listing.append(WorkloadRecord('ffmpeg-720p','ffmpeg',
+            #             '-hide_banner -loglevel warning -i \'Silent Love-720p.mp4\' -y -c:v libx264 -crf 18 -preset veryslow -c:a copy out.mp4'))
         ############## FFMPEG Encode/Decode Workloads - END     ##################
         
         ## Compile the workload list & initialize the job
         self.workloads_obj = PerfStat_WorkloadCompiler(self.workload_listing, 
-                                    iterations=self.iteration_count,
                                     set_bigcore=self.run_on_bigcore)
     
     def setup_persistant(self,workload_data:str, 
