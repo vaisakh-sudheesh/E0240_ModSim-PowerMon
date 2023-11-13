@@ -1,3 +1,4 @@
+import os
 import sys
 import glob
 import io
@@ -9,26 +10,27 @@ import re
 import csv
 import pandas
 
-# #Temporary files/directories for handling data
-# tmpdir = tempfile.TemporaryDirectory()
 
-# # Data input file
-# inputfile = 'results/11-11-ThermalAdded/Workloads/BigCore-Affine/11-11-2023_20-21-43_BigCore-10itr-100msPerf-CPUFreq-2.0GHz.tar.bz2'
 
-# # TempDirectory to string returns something like ' <TemporaryDirectory ' prefixed
-# ## for handling tmp directory cleanly, striping off these characters
-# tmpfilePath = str(tmpdir).split(' ')[1].replace('\'','').replace('>','')
-# print('Temporary directory created: '+tmpfilePath+'/')
+#Temporary files/directories for handling data
+tmpdir = tempfile.TemporaryDirectory()
 
-# # Extract Files
-# archive = tarfile.open(inputfile, 'r:bz2')
-# # An assumption is made here that the archives are stored at directory level, than directly files
-# # Hence getting the first level directory name 
-# # e.g.: <TarInfo '11-03-2023_14-58-03_BigCore-10itr-50msSmplg-CPUFreq-2.0GHz' at 0x7fbc676ecd00>
-# dirname=str(archive.getmembers()[0]).split(' ')[1].replace('\'','')
+def extract_data(data_archive:str) ->str:
+    # TempDirectory to string returns something like ' <TemporaryDirectory ' prefixed
+    ## for handling tmp directory cleanly, striping off these characters
+    tmpfilePath = str(tmpdir).split(' ')[1].replace('\'','').replace('>','')
+    print('Temporary directory created: '+tmpfilePath+'/')
 
-# archive.extractall(tmpfilePath+'/')
-# archive.close()
+    # Extract Files
+    archive = tarfile.open(data_archive, 'r:bz2')
+    # An assumption is made here that the archives are stored at directory level, than directly files
+    # Hence getting the first level directory name 
+    # e.g.: <TarInfo '11-03-2023_14-58-03_BigCore-10itr-50msSmplg-CPUFreq-2.0GHz' at 0x7fbc676ecd00>
+    dirname=str(archive.getmembers()[0]).split(' ')[1].replace('\'','')
+
+    archive.extractall(tmpfilePath+'/')
+    archive.close()
+    return os.path.join(tmpfilePath,dirname)
 
 # Define regular expressions to match the lines with data
 # Regular expression for [1] & [2], and associated result variable(s)
@@ -193,6 +195,16 @@ def Process_ProfFile(proffile:str, outcsvfile:str) -> None:
         print ('Total Records: '+ str(record_counter) )
 
 
-prof='/home/vaisakh/developer/modeling/tmp/11-11-2023_20-21-43_BigCore-10itr-100msPerf-CPUFreq-2.0GHz/stress-cpu1-100s.prof'
-Process_ProfFile(prof,'mycsvfile.csv')
+data_dir='/home/vaisakh/developer/modeling/tmp/extract/'
+
+# outdir = extract_data(prof)
+in_data_prof=os.path.join(data_dir,'IdleSleep-perf-1.prof')
+in_data_power=os.path.join(data_dir,'IdleSleep-perf-1.powdata')
+in_data_polldata=os.path.join(data_dir,'IdleSleep-perf-1.polldata')
+
+out_prof_csv = os.path.join(data_dir,'IdleSleep-perf-1.prof.csv')
+Process_ProfFile(in_data_prof,out_prof_csv)
+
+
+
 
