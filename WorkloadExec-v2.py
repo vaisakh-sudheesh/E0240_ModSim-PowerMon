@@ -35,8 +35,8 @@ print(src_root)
 # bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
 # littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
 
-bigcore_freq_list    = [1800000, 1600000, 1400000, 1200000]
-littlecore_freq_list = [1400000, 1200000, 1000000, 800000 ]
+bigcore_freq_list = [1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
+littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
 
 idle_bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000 ]
 idle_littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000 ]
@@ -92,17 +92,24 @@ def execute_idle_scenario (test_desc_prefix:str,
         del idle_wkld
 
 if __name__ == '__main__':
-    # execute_workload (test_desc_prefix='BigCore-10itr-100msPerf', on_bigcluster=True, freq_list= bigcore_freq_list)
-    # execute_workload (test_desc_prefix='LittleCore-10itr-100msPerf', on_bigcluster=False, freq_list= littlecore_freq_list)
-
-    # execute_idle_scenario (test_desc_prefix='Idleworkload-MaxFan-LittleCore-60sidle', on_bigcluster=False,max_fan=True, freq_list= idle_littlecore_freq_list)
-    # execute_idle_scenario (test_desc_prefix='Idleworkload-NoFan-LittleCore-60sidle', on_bigcluster=False,max_fan=False, freq_list= idle_littlecore_freq_list)
+    ## 13/11 - Full set Done
+    # execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-LittleCore-20sidle, on_bigcluster=False, perf_sleep=True, max_fan=True, freq_list= idle_littlecore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-LittleCore-20sidle', on_bigcluster=False, perf_sleep=True, max_fan=False, freq_list= idle_littlecore_freq_list)
+    # execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-BigCore-20sidle', on_bigcluster=True, perf_sleep=True,  max_fan=True, freq_list= idle_bigcore_freq_list)
+    #execute_idle_scenario (test_desc_prefix='Idleworkload-MaxFan-LittleCore-60sidle', on_bigcluster=False,max_fan=True, freq_list= idle_littlecore_freq_list)
+    #execute_idle_scenario (test_desc_prefix='Idleworkload-NoFan-LittleCore-60sidle', on_bigcluster=False,max_fan=False, freq_list= idle_littlecore_freq_list)
     # execute_idle_scenario (test_desc_prefix='Idleworkload-MaxFan-BigCore-60sidle', on_bigcluster=True, max_fan=True, freq_list= idle_bigcore_freq_list)
     # execute_idle_scenario (test_desc_prefix='Idleworkload-NoFan-BigCore-60sidle', on_bigcluster=True, max_fan=False, freq_list= idle_bigcore_freq_list)
 
-    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-LittleCore-20sidl10Itr', on_bigcluster=False, perf_sleep=True, max_fan=True, freq_list= idle_littlecore_freq_list)
-    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-LittleCore-20sidl10Itr', on_bigcluster=False, perf_sleep=True, max_fan=False, freq_list= idle_littlecore_freq_list)
-    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-MaxFan-BigCore-20sidl10Itr', on_bigcluster=True, perf_sleep=True,  max_fan=True, freq_list= idle_bigcore_freq_list)
-    execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-BigCore-20sidl10Itr', on_bigcluster=True, perf_sleep=True,  max_fan=False, freq_list= idle_bigcore_freq_list)    
+    ## TODO: Gather No fan Big core 2.0GHz to 1.5GHz
+    ### execute_idle_scenario (test_desc_prefix='IdlePerfSleepWorkload-NoFan-BigCore-20sidle', on_bigcluster=True, perf_sleep=True,  max_fan=False, freq_list= idle_bigcore_freq_list)    
+
+## Started now to complete the idle current ones
+    ## 13/11 - 2GHz Bigcore done
+    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, freq_list= bigcore_freq_list)
+    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, freq_list= littlecore_freq_list)
+
+## TODO: Gather Both Idle and Workload configs in BigCore for 1.1 GHz and lower
+## TODO: Gather Both Idle and Workload configs in Little Core for 0.7 GHz and lower
 
 
