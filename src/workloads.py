@@ -94,7 +94,6 @@ class PerfStat_WorkloadCompiler:
                             + self.__perf_stat_cmd_result_options + results_file +' '\
                             + self.__perf_stat_cmd_sampling_options +' '\
                             + self.__perf_stat_cmd_cpu_options +' '\
-                            + self.__perf_stat_cmd_repeat_options + str(iterations) +' '\
                             + '-e ' + self.__perf_event_listing +' '\
                             + taskset_cmd + ' '\
                             + item.cmd()
