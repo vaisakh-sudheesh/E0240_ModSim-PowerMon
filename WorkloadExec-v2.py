@@ -89,8 +89,14 @@ if __name__ == '__main__':
 # bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000 ]
 # littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000 ]
     
-    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, 
-                           freq_list= [800000, 700000, 600000, 500000, 400000, 300000, 200000])
     execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
-                      freq_list= [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000 ])
+                      freq_list= [700000, 600000 ])
+    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, 
+                      freq_list= [500000, 400000])
+    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
+                      freq_list= [500000, 400000 ])
+    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, 
+                      freq_list= [300000, 200000])
+    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
+                      freq_list= [300000, 200000 ])
     pass
