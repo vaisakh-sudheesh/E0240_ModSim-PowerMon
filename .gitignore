@@ -166,3 +166,5 @@ results/10-30-2023_11-50-21/stress-3cpu-10s.prof
 results/10-30-2023_11-50-21/stress-3cpu-10s.prof.powdata
 results/10-30-2023_11-50-21/stress-4cpu-10s.prof
 results/10-30-2023_11-50-21/stress-4cpu-10s.prof.powdata
+
+combined_dataset/*
