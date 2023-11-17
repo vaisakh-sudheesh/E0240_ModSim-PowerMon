@@ -50,6 +50,20 @@ class NCSampler:
                 if ready[0]:
                     data, _ = self.sock.recvfrom(81)
                     fields = data.strip().split(b',')
+                    # BUG:
+                    # Data source: 1-14-2023_22-20-44_BigCore-100msPerf-CPUFreq-0.8GHz.tar.bz2   /ffmpeg-360p-2.pow
+                    #    @SHA: commit/ab98cf19b24060207cd63b1ef274c8105a496c7c
+                    #
+                    # Snippet:
+                    #      ...
+                    #      2023-11-14 19:37:37.949976,2023-11-15 01:07:37.949980,b'0166542656',
+                    #      2023-11-14 19:37:38,2023-11-15 01:07:38.000005,b'0166542706',   <!-- here, observe UTC timestamp record here
+                    #      2023-11-14 19:37:38.048999,2023-11-15 01:07:38.049001,b'0166542755',
+                    #      ...
+                    #
+                    # The corner case of timestamp getting generated without the decimal part happen as the time sampled falls right at the Minute change margin.
+                    # This create issue in pandas data frame handling of ValueException
+                    # Try to handle this by using proper format specification that data source itsel handles it.
                     row = [datetime.datetime.utcnow()]+[datetime.datetime.now()]+fields
                     self.writer.writerow(row)
         except socket.timeout:
