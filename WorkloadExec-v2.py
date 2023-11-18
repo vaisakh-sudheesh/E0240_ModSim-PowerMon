@@ -48,7 +48,7 @@ def execute_workload (test_desc_prefix:str,freq_list:[int], on_bigcluster:bool=T
         # Setup the workload
         cpuload_wkld = work.CPUIntensiveWorkloads(conn,
                                 run_on_bigcore=on_bigcluster,
-                                iteration_count=3,
+                                iteration_count=2,
                                 enable_stress_workloads= True,
                                 enable_compress_workloads = True,
                                 enable_encode_workloads = True 
@@ -75,7 +75,7 @@ def execute_idle_scenario (test_desc_prefix:str,
                                 run_on_bigcore=on_bigcluster,
                                 idle_duration=60,
                                 run_perf_sleep=perf_sleep ,
-                                iteration_count=3 # applicable only for perf-sleep case
+                                iteration_count=2 # applicable only for perf-sleep case
                           )
         idle_wkld.setup_persistant(resultsdir_prefix=workload_result_dir, testname_suffix=test_desc_composed)
         # Run the workload
@@ -86,17 +86,21 @@ def execute_idle_scenario (test_desc_prefix:str,
         del idle_wkld
 
 if __name__ == '__main__':
-# bigcore_freq_list = [2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000 ]
-# littlecore_freq_list = [1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000 ]
-    
-    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
-                      freq_list= [700000, 600000 ])
-    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, 
-                      freq_list= [500000, 400000])
-    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
-                      freq_list= [500000, 400000 ])
-    execute_workload (test_desc_prefix='BigCore-100msPerf', on_bigcluster=True, 
-                      freq_list= [300000, 200000])
-    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False, 
-                      freq_list= [300000, 200000 ])
+# bigcore_freq_list = [
+#        2000000, 1900000, 1800000, 1700000, 1600000, 1500000, 1400000, 1300000 , 1200000,
+#        1100000, 1000000, 900000, 800000, 700000, 600000, 500000, 400000, 300000, 200000
+# ]
+# littlecore_freq_list = [
+#        1400000, 1300000 , 1200000, 1100000, 1000000, 900000, 800000, 700000, 600000,
+#        500000, 400000, 300000, 200000
+# ]
+
+    # 17-11-2023 : Completed
+    # execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False,  freq_list=[ 700000, 600000 ])
+    # execute_workload (test_desc_prefix='BigCore-100msPerf',    on_bigcluster=True,   freq_list=[ 500000, 400000 ])
+    # execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False,  freq_list=[ 500000, 400000 ])
+    # execute_workload (test_desc_prefix='BigCore-100msPerf',    on_bigcluster=True,   freq_list=[ 300000, 200000 ])
+
+    # In-pipeline
+    execute_workload (test_desc_prefix='LittleCore-100msPerf', on_bigcluster=False,  freq_list=[ 300000, 200000 ])
     pass
