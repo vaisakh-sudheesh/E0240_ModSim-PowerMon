@@ -262,10 +262,22 @@ def addOptions(parser):
         help="Big CPU clock frequency",
     )
     parser.add_argument(
+        "--big-cpu-voltage",
+        type=str,
+        default="1.25V",
+        help="Big CPU voltage",
+    )
+    parser.add_argument(
         "--little-cpu-clock",
         type=str,
         default="1GHz",
         help="Little CPU clock frequency",
+    )
+    parser.add_argument(
+        "--little-cpu-voltage",
+        type=str,
+        default="1.25V",
+        help="Little CPU voltage",
     )
     parser.add_argument(
         "--sim-quantum",
@@ -366,7 +378,7 @@ def build(options):
     # big cluster
     if options.big_cpus > 0:
         system.bigCluster = big_model(
-            system, options.big_cpus, options.big_cpu_clock
+            system, options.big_cpus, options.big_cpu_clock, options.big_cpu_voltage
         )
         system.mem_mode = system.bigCluster.memory_mode()
         all_cpus += system.bigCluster.cpus
@@ -374,7 +386,7 @@ def build(options):
     # little cluster
     if options.little_cpus > 0:
         system.littleCluster = little_model(
-            system, options.little_cpus, options.little_cpu_clock
+            system, options.little_cpus, options.little_cpu_clock, options.little_cpu_voltage
         )
         system.mem_mode = system.littleCluster.memory_mode()
         all_cpus += system.littleCluster.cpus
