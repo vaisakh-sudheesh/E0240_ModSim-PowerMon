@@ -101,7 +101,7 @@ class LittleCluster(devices.ArmCpuCluster):
         super().__init__(system, num_cpus, cpu_clock, cpu_voltage, *cpu_config)
 
 
-class Ex5BigCluster(devices.CpuCluster):
+class Ex5BigCluster(devices.ArmCpuCluster):
     def __init__(self, system, num_cpus, cpu_clock, cpu_voltage="1.0V"):
         cpu_config = [
             ObjectList.cpu_list.get("ex5_big"),
@@ -112,7 +112,7 @@ class Ex5BigCluster(devices.CpuCluster):
         super().__init__(system, num_cpus, cpu_clock, cpu_voltage, *cpu_config)
 
 
-class Ex5LittleCluster(devices.CpuCluster):
+class Ex5LittleCluster(devices.ArmCpuCluster):
     def __init__(self, system, num_cpus, cpu_clock, cpu_voltage="1.0V"):
         cpu_config = [
             ObjectList.cpu_list.get("ex5_LITTLE"),
