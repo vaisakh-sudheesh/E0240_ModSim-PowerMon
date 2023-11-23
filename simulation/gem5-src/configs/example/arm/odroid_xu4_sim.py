@@ -98,7 +98,7 @@ def main():
     bL.instantiate(options)
 
     # Dumping stats periodically
-    m5.stats.periodicStatDump(m5.ticks.fromSeconds(0.1e-3))
+    # m5.stats.periodicStatDump(m5.ticks.fromSeconds(0.1e-3))
     bL.run()
 
 
